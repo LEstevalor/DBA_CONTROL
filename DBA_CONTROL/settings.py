@@ -9,12 +9,15 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
+import sys
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# print(os.path.join(BASE_DIR, 'DBA_CONTROL\\apps'))  # D:\usage_work\课设\数据库课设\DBA_CONTROL\DBA_CONTROL\apps
+sys.path.insert(0, os.path.join(BASE_DIR, 'DBA_CONTROL\\apps'))  # 使app路径被识别为app
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',   # DRF
+    'user.apps.UserConfig',  # 用户模块'
 ]
 
 MIDDLEWARE = [
@@ -82,6 +86,36 @@ DATABASES = {
     }
 }
 
+# 配置redis缓存
+CACHES = {
+    # 默认缓存配置
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    },
+    "verify_codes": {  # 缓存验证码
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+# 发送邮箱配置(注释掉的配置为全局已经有的默认配置)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_PORT = 25
+EMAIL_HOST = 'smtp.163.com'   # 邮箱服务器
+# 发送邮件的邮箱
+EMAIL_HOST_USER = 'lxd2534891955@163.com'
+# 在邮箱中设置的客户端授权密码
+EMAIL_HOST_PASSWORD = 'MQFAOXAEQJTEALXO'
+# 收件⼈看到的发件⼈
+EMAIL_FROM = 'GDUT龙洞助手<lxd2534891955@163.com>'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
