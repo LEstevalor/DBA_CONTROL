@@ -28,8 +28,14 @@ SECRET_KEY = 'django-insecure-t((w3h1_p*+8$@0kxxukiw=**$4aq8%6on=0)5lnxcutkt0=s-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+# 允许哪些域名访问Django
+ALLOWED_HOSTS = ['127.0.0.1', 'Localhost']
+# CORS追加白名单（显然针对的是前端域名）（后端可能自己识别不到自己吗？）
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+)
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 # Application definition
 
@@ -43,9 +49,12 @@ INSTALLED_APPS = [
 
     'rest_framework',   # DRF
     'user.apps.UserConfig',  # 用户模块'
+
+    'corsheaders',          # 解决跨域CORS
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',    # 最外层的中间件（先解决跨域问题了再走下面的中间件，所以放最前面）
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

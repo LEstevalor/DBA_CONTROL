@@ -8,8 +8,8 @@ from rest_framework.views import APIView
 from django_redis import get_redis_connection
 from rest_framework.response import Response
 
-from user.utils import constants
-from user.utils.tools import is_valid_email
+from DBA_CONTROL.utils import constants
+from DBA_CONTROL.utils.tools import is_valid_email
 
 logger = logging.getLogger('django')
 
@@ -32,8 +32,8 @@ class EmailVerifyView(APIView):
         logger.info(sms_code)
 
         pl = redis_conn.pipeline()  # redis管道技术
-        pl.setex('send_%s' % email, constants.EMAIL_CODE_REDIS_EXPIRES, sms_code)
-        pl.setex('send_flag_%s' % email, constants.SEND_SMS_CODE_INTERVAL, 1)
+        pl.setex('send_%s' % email, constants.USER_EMAIL_CODE_REDIS_EXPIRES, sms_code)
+        pl.setex('send_flag_%s' % email, constants.USER_SEND_SMS_CODE_INTERVAL, 1)
         pl.execute()
 
         subject = "GDUT DBA系统 邮箱验证"
