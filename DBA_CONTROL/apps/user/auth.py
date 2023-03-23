@@ -8,10 +8,12 @@ def get_user_by_account(account):
     """根据传⼊的账号获取⽤户信息"""
     try:
         if re.match('^1[3-9]\d{9}$', account):
-            # ⼿机号登录
+            # 邮箱登录
+            # SQL: select * from user where email = account
             user = User.objects.get(email=account)
         else:
             # ⽤户名登录
+            # SQL: select * from user where username = account
             user = User.objects.get(username=account)
     except User.DoesNotExist:
         return None
