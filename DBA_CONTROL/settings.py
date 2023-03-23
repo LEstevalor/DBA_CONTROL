@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',   # DRF
     'user.apps.UserConfig',  # 用户模块
     'cmts.apps.CmtsConfig',  # 院校专业老师学生模块
+    'classes.apps.ClassConfig',  # 班级教研模块
+    'courses.apps.CoursesConfig',  # 学生课程模块
 
     'corsheaders',          # 解决跨域CORS
 ]
