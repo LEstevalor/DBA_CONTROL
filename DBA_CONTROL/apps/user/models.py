@@ -29,7 +29,7 @@ class User(BaseModel):
     )
 
     class Meta:
-        db_table = 'tb_users'
+        db_table = 'gdut_users'
         verbose_name = '用户'
         verbose_name_plural = verbose_name
         # 元数据主要用在管理后台的展示上，verbose_name_plural 是模型类的复数名 。如果不设置的话，Django 会使用小写的模型名作为默认值，并且在结尾加上 s。通过此项元数据设置名字可以去掉 s。
