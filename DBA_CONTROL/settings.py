@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',   # DRF
-    'user.apps.UserConfig',  # 用户模块'
+    'user.apps.UserConfig',  # 用户模块
+    'cmts.apps.CmtsConfig',  # 院校专业老师学生模块
 
     'corsheaders',          # 解决跨域CORS
 ]
