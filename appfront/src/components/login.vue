@@ -188,9 +188,40 @@ export default {
           return false
         })
     },
-    trueRegister () {
-      if (this.check_before_email() && this.check_send_code()) { // 填了前面的信息，后面的邮箱验证码校验才有意义
-        axios.post(host + '/users/', {
+    check_unique_username () {  // 账号是否注册过
+      axios.get(this.host + '/unique/', {responseType: 'json',
+        params: {username: this.username, str: "username"}})
+        .then(response => {
+          if (response.data.count > 0) {
+            this.errorInfoBox('账号已注册过')
+            return false
+          } else {
+            return true
+          }
+        }).catch(error => {
+          console.log(error.response.data)
+          return true
+        })
+    },
+    check_unique_email () { // 邮箱是否唯一
+      axios.get(this.host + '/unique/', {responseType: 'json',
+        params: {email: this.email, str: "email"}})
+        .then(response => {
+          if (response.data.count > 0) {
+            this.errorInfoBox('邮箱已注册过')
+            return false
+          } else {
+            return true
+          }
+        }).catch(error => {
+          console.log(error.response.data)
+          return true
+        })
+    },
+    trueRegister () { // 注册
+      if (this.check_before_email() && this.check_unique_username() && this.check_unique_email()
+        && this.check_send_code()) { // 填了前面的信息，后面的邮箱验证码校验才有意义
+        axios.post(host + '/user_register/', {
           username: this.username,
           password: this.password,
           password2: this.password2,
