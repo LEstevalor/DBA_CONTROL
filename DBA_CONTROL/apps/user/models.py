@@ -1,10 +1,14 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from DBA_CONTROL.utils.models import BaseModel
+level_choicses = (
+    ("USER", "普通用户"),
+    ("ADMIN", "管理员"),
+    ("SUPER_ADMIN", "超级管理员")
+)
 
 
-class User(BaseModel):
+class User(AbstractUser):
     """自定义用户模型类"""
     # 账号（唯一） 密码 电话 邮箱（唯一） 用户级别
 
@@ -18,15 +22,11 @@ class User(BaseModel):
         level CHAR(20) CHECK(level IN ('USER', 'ADMIN', 'SUPER_ADMIN'))
     ) COMMENT='用户';
     """
-    username = models.CharField(max_length=20, unique=True, verbose_name='账号')
-    password = models.CharField(max_length=20, verbose_name='密码')
+    # username = models.CharField(max_length=20, unique=True, verbose_name='账号')
+    # password = models.CharField(max_length=20, verbose_name='密码')
     mobile = models.CharField(max_length=11, blank=True, verbose_name='手机号')
-    email = models.EmailField(max_length=30, unique=True, verbose_name='邮箱')
-    level = (
-        ("USER", "普通用户"),
-        ("ADMIN", "管理员"),
-        ("SUPER_ADMIN", "超级管理员")
-    )
+    # email = models.EmailField(max_length=30, unique=True, verbose_name='邮箱')
+    level = models.CharField(max_length=15, choices=level_choicses, default="USER")  # level_choicses写在model外
 
     class Meta:
         db_table = 'gdut_users'

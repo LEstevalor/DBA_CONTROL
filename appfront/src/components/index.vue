@@ -361,7 +361,7 @@ export default {
     window.addEventListener('resize', this.handleResize)
     /* 以上代码是为了自适应例子父级的宽高而设置 */
     // 未登录跳转回登录页面逻辑
-    if (sessionStorage.user_id || localStorage.user_id) {
+    if ((sessionStorage.username || localStorage.username) && (sessionStorage.token || localStorage.token)) {
       console.log('登录了')
     } else {
       this.$router.push('/login')

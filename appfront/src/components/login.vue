@@ -14,7 +14,7 @@
         <form>
           <h1 style='text-align: center;color: aliceblue;'>WELCOME TO GDUT DBA</h1>
           <p>账 号: <input id='username' v-model="username" type='text'>
-            <span v-bk-tooltips.top-start="'学号或职工号为账号'" class='top-start'>
+            <span v-bk-tooltips.top-start="'学号或职工号为账号或邮箱'" class='top-start'>
                 <i class='bk-icon icon-info-circle-shape'></i>
             </span>
           </p>
@@ -35,7 +35,7 @@
           <h1 style='text-align: center;color: aliceblue;'>WELCOME TO GDUT DBA</h1>
           <p>  账 号: <input id='username2' v-model="username" type='text'></p>
           <p>  密 码: <input id='password2' v-model="password" type='password'></p>
-          <p>重输密码: <input id='password_2' v-model="password2" type='password'></p>
+          <p>重输密码: <input id='password22' v-model="password2" type='password'></p>
           <p>  手 机: <input id='phone' v-model="phone" type='text'></p>
           <p>  邮 箱: <input id='email' v-model="email" type='text'></p>
           <p><label>验证码:</label>
@@ -75,6 +75,9 @@ export default {
       email: '', // 邮箱
       sms_code: '', // 短信验证码
       send_flag: true, // 用于标志允许用户发送验证码
+      check_unique_username_res: false,
+      check_unique_email_res: false,
+      check_send_code_res: false,
       loginForm: {
         username: '', // 用户名
         password: '' // 密码
@@ -89,9 +92,9 @@ export default {
   },
   methods: {
     check_error_username () {
-      console.log(!this.username)
-      console.log(/^\d{10}$/.test(this.username))
-      console.log(this.username === 'admin')
+      // console.log(!this.username)
+      // console.log(/^\d{10}$/.test(this.username))
+      // console.log(this.username === 'admin')
       return !this.username || !(/^\d{10}$/.test(this.username) || this.username === 'admin')
     },
     handleSubmit () {
@@ -100,7 +103,24 @@ export default {
       } else if (!this.password) {
         this.warningInfoBox('请输入密码')
       } else {
-        // w
+        axios.post(host + '/login/', {username: this.username, password: this.password}, {
+          responseType: 'json',
+          withCredentials: true // 跨域情况可以携带cookie
+        }).then(response => {
+          this.successInfoBox('登录成功')
+          // 记住登录
+          sessionStorage.clear()
+          localStorage.clear()
+          localStorage.token = response.data.token
+          localStorage.username = response.data.username
+          this.$router.push('/') // 根据index.js的路由跳转到index.vue
+        }).catch(error => {
+          if (error.response.status === 400) {
+            this.errorInfoBox(error.response.data.message) // 展示发送短信错误提示
+          } else {
+            console.log(error.response.data)
+          }
+        })
       }
     },
     handleLogin () {
@@ -172,12 +192,13 @@ export default {
     check_send_code () { // 验证码校验
       if (this.sms_code === '' || this.sms_code.length !== 6) {
         this.warningInfoBox('验证码错误')
-        return false
+        return
       }
-      axios.post(host + '/email_codes/', {sms_code: this.sms_code, email: this.email})
+      axios.get(host + '/check_email_codes/', {responseType: 'json',
+        params: {sms_code: this.sms_code, email: this.email}})
         .then(response => {
-          this.successInfoBox()
-          return true
+          this.check_send_code_res = true
+          this.successInfoBox('验证码正确')
         })
         .catch(error => {
           if (error.response.status === 400) {
@@ -185,64 +206,77 @@ export default {
           } else {
             console.log(error.response.data)
           }
-          return false
+          this.check_send_code_res = false
         })
     },
     check_unique_username () { // 账号是否注册过
-      axios.get(this.host + '/unique/', {responseType: 'json',
+      axios.get(host + '/unique/', {responseType: 'json',
         params: {username: this.username, str: 'username'}})
         .then(response => {
           if (response.data.count > 0) {
             this.errorInfoBox('账号已注册过')
-            return false
+            this.check_unique_username_res = false
           } else {
-            return true
+            console.log('账号unique')
+            this.check_unique_username_res = true
           }
         }).catch(error => {
           console.log(error.response.data)
-          return true
+          this.check_unique_username_res = false
         })
     },
     check_unique_email () { // 邮箱是否唯一
-      axios.get(this.host + '/unique/', {responseType: 'json',
+      axios.get(host + '/unique/', {responseType: 'json',
         params: {email: this.email, str: 'email'}})
         .then(response => {
           if (response.data.count > 0) {
             this.errorInfoBox('邮箱已注册过')
-            return false
+            this.check_unique_email_res = false
           } else {
-            return true
+            console.log('邮箱unique')
+            this.check_unique_email_res = true
           }
         }).catch(error => {
           console.log(error.response.data)
-          return true
+          this.check_unique_email_res = false
         })
     },
     trueRegister () { // 注册
-      if (this.check_before_email() && this.check_unique_username() &&
-        this.check_unique_email() && this.check_send_code()) { // 填了前面的信息，后面的邮箱验证码校验才有意义
-        axios.post(host + '/user_register/', {
-          username: this.username,
-          password: this.password,
-          password2: this.password2,
-          mobile: this.mobile,
-          email: this.email,
-          sms_code: this.sms_code
-        }, {responseType: 'json'})
-          .then(response => {
-            // 记录用户的登录状态
-            sessionStorage.clear()
-            sessionStorage.username = response.data.username
-            sessionStorage.user_id = response.data.id
-            this.$router.push('/') // 根据index.js的路由跳转到index.vue
-          })
-          .catch(error => {
-            if (error.response.status === 400) {
-              this.warningInfoBox('数据错误')
-            } else {
-              console.log(error.response.data)
-            }
-          })
+      if (this.check_before_email()) { // 填了前面的信息，后面的邮箱验证码校验才有意义
+        this.check_unique_username()
+        this.check_unique_email()
+        this.check_send_code()
+
+        console.log(this.check_unique_username_res)
+        console.log(this.check_unique_email_res)
+        console.log(this.check_send_code_res)
+
+        if (this.check_unique_username_res && this.check_unique_email_res && this.check_send_code_res) {
+          axios.post(host + '/user_register/', {
+            username: this.username,
+            password: this.password,
+            password2: this.password2,
+            mobile: this.phone, // 前端用的phone，后端用的mobile
+            email: this.email
+          }, {responseType: 'json'})
+            .then(response => {
+              this.successInfoBox('注册正确')
+              // 记录用户的登录状态
+              sessionStorage.clear()
+              localStorage.clear()
+              localStorage.token = response.data.token
+              localStorage.username = response.data.username
+              localStorage.user_id = response.data.id
+              this.$router.push('/') // 根据index.js的路由跳转到index.vue
+            })
+            .catch(error => {
+              if (error.response.status === 400) {
+                this.warningInfoBox('数据错误')
+              } else {
+                console.log(error.response.data)
+              }
+            })
+        }
       }
     },
     warningInfoBox (msg) {
@@ -270,11 +304,11 @@ export default {
         }
       }, 1000)
     },
-    successInfoBox () {
+    successInfoBox (msg) {
       const h = this.$createElement
       const a = this.$bkInfo({
         type: 'success',
-        title: '验证码正确',
+        title: msg,
         showFooter: false,
         subHeader: h('a', {
           style: {

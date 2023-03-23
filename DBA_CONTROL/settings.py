@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'courses.apps.CoursesConfig',  # 学生课程模块
 
     'corsheaders',          # 解决跨域CORS
+    'rest_framework_simplejwt',  # jwt
 ]
 
 MIDDLEWARE = [
@@ -128,6 +130,25 @@ EMAIL_HOST_USER = 'lxd2534891955@163.com'
 EMAIL_HOST_PASSWORD = 'MQFAOXAEQJTEALXO'
 # 收件⼈看到的发件⼈
 EMAIL_FROM = 'GDUT龙洞助手<lxd2534891955@163.com>'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # jwt配置
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # JWT有效期
+}
+
+# 修改默认的认证后端
+AUTHENTICATION_BACKENDS = [
+ 'user.auth.MyAuthBackend',
+]
+
+# 配置自定义用户表MyUser
+AUTH_USER_MODEL = 'user.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
