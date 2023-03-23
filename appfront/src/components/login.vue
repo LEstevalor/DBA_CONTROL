@@ -55,9 +55,10 @@
 </template>
 
 <script>
-import { bkInput } from 'bk-magic-vue'
+import {bkInput} from 'bk-magic-vue'
 import axios from 'axios'
-import { host } from '../../static/js/host'
+import {host} from '../../static/js/host'
+
 export default {
   components: {
     bkInput
@@ -168,17 +169,49 @@ export default {
         return true
       }
     },
-    check_send_code () {
+    check_send_code () { // 验证码校验
       if (this.sms_code === '' || this.sms_code.length !== 6) {
         this.warningInfoBox('验证码错误')
         return false
       }
-
-      return true
+      axios.post(host + '/email_codes/', {sms_code: this.sms_code, email: this.email})
+        .then(response => {
+          this.successInfoBox()
+          return true
+        })
+        .catch(error => {
+          if (error.response.status === 400) {
+            this.errorInfoBox(error.response.data.message) // 展示发送短信错误提示
+          } else {
+            console.log(error.response.data)
+          }
+          return false
+        })
     },
     trueRegister () {
-      if (this.check_before_email() && this.check_send_code()) {
-        // 2
+      if (this.check_before_email() && this.check_send_code()) { // 填了前面的信息，后面的邮箱验证码校验才有意义
+        axios.post(host + '/users/', {
+          username: this.username,
+          password: this.password,
+          password2: this.password2,
+          mobile: this.mobile,
+          email: this.email,
+          sms_code: this.sms_code
+        }, {responseType: 'json'})
+          .then(response => {
+            // 记录用户的登录状态
+            sessionStorage.clear()
+            sessionStorage.username = response.data.username
+            sessionStorage.user_id = response.data.id
+            this.$router.push('/') // 根据index.js的路由跳转到index.vue
+          })
+          .catch(error => {
+            if (error.response.status === 400) {
+              this.warningInfoBox('数据错误')
+            } else {
+              console.log(error.response.data)
+            }
+          })
       }
     },
     warningInfoBox (msg) {
@@ -193,14 +226,36 @@ export default {
     errorInfoBox (msg) {
       const a = this.$bkInfo({
         type: 'error',
-        title: '验证失败:' + msg,
-        subTitle: '此窗口3秒后关闭',
+        title: 'Fail:' + msg,
+        subTitle: '窗口2秒后关闭',
         showFooter: false
       })
-      let num = 3
+      let num = 2
       let t = setInterval(() => {
         a.subTitle = `此窗口${--num}秒后关闭`
         if (num === 0) {
+          clearInterval(t)
+          a.close()
+        }
+      }, 1000)
+    },
+    successInfoBox () {
+      const h = this.$createElement
+      const a = this.$bkInfo({
+        type: 'success',
+        title: '验证码正确',
+        showFooter: false,
+        subHeader: h('a', {
+          style: {
+            color: '#3a84ff',
+            textDecoration: 'none',
+            cursor: 'pointer'
+          }
+        })
+      })
+      let num = 1
+      let t = setInterval(() => {
+        if (--num === 0) {
           clearInterval(t)
           a.close()
         }

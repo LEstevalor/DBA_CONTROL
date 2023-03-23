@@ -43,3 +43,16 @@ class EmailVerifyView(APIView):
         send_mail(subject, "", settings.EMAIL_FROM, [email], html_message=html_message)
 
         return Response({'message': 'ok'})
+
+    def post(self, request):
+        # print(request.data)  # 测试数据：{'sms_code': 123456}
+        front_email_code = request.data['sms_code']  # 前端提交的验证码
+        redis_conn = get_redis_connection('verify_codes')
+        real_email_code = redis_conn.get('send_%s' % request.data['email'])
+
+        if real_email_code is None:  # 验证码过期的情况
+            return Response({'message': '验证码过期或未申请过'}, status=status.HTTP_400_BAD_REQUEST)
+        if front_email_code != real_email_code:
+            return Response({'message': '验证码错误'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'ok'})
