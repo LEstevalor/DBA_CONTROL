@@ -114,7 +114,7 @@ export default {
           localStorage.clear()
           localStorage.token = response.data.token
           localStorage.username = response.data.username
-          this.$router.push('/') // 根据index.js的路由跳转到index.vue
+          this.$router.push('/top') // 根据index.js的路由跳转到top.vue
         }).catch(error => {
           if (error.response.status === 400) {
             this.errorInfoBox(error.response.data.message) // 展示发送短信错误提示
@@ -278,7 +278,7 @@ export default {
               localStorage.token = response.data.token
               localStorage.username = response.data.username
               localStorage.user_id = response.data.id
-              this.$router.push('/') // 根据index.js的路由跳转到index.vue
+              this.$router.push('/top') // 根据index.js的路由跳转到top.vue
             })
             .catch(error => {
               if (error.response.status === 400) {

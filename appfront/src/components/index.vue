@@ -121,26 +121,16 @@
           </bk-navigation-menu-item>
         </bk-navigation-menu>
       </template>
-      <div class="monitor-navigation-content">
-        <img src="../assets/TEGNOLOGY2.jpg" style="float:left;"/>
-        <bk-swiper :pics="pics" :loop-time="4000" class="swiper" style="float:right;"></bk-swiper>
-        <h1>KEY: 数据库  存储  SQL  NOSQL  MYSQL  REDIS  安全  并发  缓存  内存  服务  集群</h1>
-      </div>
+      <router-view class="monitor-navigation-content"></router-view>
       <fx67ll-binary-clock :isShowTime="true" :zoomSize="1"></fx67ll-binary-clock>
     </bk-navigation>
   </div>
 </template>
 
 <script>
-import { bkNavigation, bkNavigationMenu, bkNavigationMenuItem, bkSelect, bkOption, bkPopover, bkButton, bkSwiper }
-  from 'bk-magic-vue'
+import { bkNavigation, bkNavigationMenu, bkNavigationMenuItem, bkSelect, bkOption, bkPopover, bkButton } from 'bk-magic-vue'
 import axios from 'axios'
 import {host} from '../../static/js/host'
-import firstSwiper from '../assets/china2023.jpg'
-import secondSwiper from '../assets/gdut_label.jpg'
-import thirdSwiper from '../assets/db.jpg'
-import fourthSwiper from '../assets/nosql.jpg'
-import fifthSwiper from '../assets/machine.jpg'
 
 export default {
   name: 'monitor-navigation',
@@ -151,8 +141,7 @@ export default {
     bkSelect,
     bkOption,
     bkPopover,
-    bkButton,
-    bkSwiper // 轮播图
+    bkButton
   },
   data () {
     return {
@@ -164,18 +153,18 @@ export default {
             icon: 'icon-tree-application-shape',
             url: '/overview/',
             open: true,
-            children: [
-              {
-                name: '首页',
-                active: true
-              }
-            ]
+            group: true
+            // children: [
+            //   {
+            //     name: '首页',
+            //     active: true
+            //   }
+            // ]
           },
           {
             name: '学院',
             icon: 'icon-tree-group-shape',
-            url: '/bp/',
-            group: true
+            url: '/bp/'
           },
           {
             name: '专业',
@@ -188,20 +177,25 @@ export default {
             url: '/uptime_check/summary/'
           },
           {
-            name: '学生',
+            name: '学生信息',
             icon: 'icon-qq-shape',
-            url: '/operation_monitor/',
-            children: [
-              {
-                name: '学生信息'
-              },
-              {
-                name: '课程信息'
-              }
-            ]
+            url: '/operation_monitor/'
+            // children: [
+            //   {
+            //     name: '学生信息'
+            //   },
+            //   {
+            //     name: '课程信息'
+            //   }
+            // ]
           },
           {
             name: '班级',
+            icon: 'icon-clock-shape',
+            url: '/datasource/'
+          },
+          {
+            name: '课程信息',
             icon: 'icon-clock-shape',
             url: '/datasource/'
           },
@@ -304,15 +298,7 @@ export default {
             id: 'chinese'
           }
         ]
-      },
-      pics: [
-        // { url: firstSwiper, link: 'https://www.npmjs.com/package/bk-magic-vue' },
-        { url: firstSwiper },
-        { url: secondSwiper },
-        { url: thirdSwiper },
-        { url: fourthSwiper },
-        { url: fifthSwiper }
-      ]
+      }
     }
   },
   computed: {
