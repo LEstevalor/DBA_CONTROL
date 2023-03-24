@@ -11,4 +11,6 @@ urlpatterns = (
     url(r'^unique/$', views.UniqueView.as_view()),  # 检查账号或邮箱是否注册过
 
     url(r'^login/$', views.LoginTokenView.as_view(), name='token_obtain_pair'),     # JWT登录功能
+
+    url(r'^get_username_realname/$', views.RealNameView.as_view()),  # 获取真实姓名
 )

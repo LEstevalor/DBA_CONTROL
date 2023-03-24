@@ -1,5 +1,6 @@
 import logging
 
+from django.db import connection
 from django.conf import settings
 from random import randint
 from django.core.mail import send_mail
@@ -12,6 +13,7 @@ from rest_framework_simplejwt.views import TokenViewBase
 
 from DBA_CONTROL.utils import constants
 from DBA_CONTROL.utils.tools import is_valid_email
+from cmts.models import Student, Teacher
 from user.models import User
 from user.serializers import CreateUserSerializer, MyTokenObtainPairSerializer
 
@@ -68,7 +70,6 @@ class EmailVerifyView(APIView):
 
 class UniqueView(APIView):
     """唯一注册视图"""
-
     def get(self, request):
         str = request.GET.get("str")
         front_str = request.GET.get(str)
@@ -90,3 +91,25 @@ class RegisterUserView(CreateAPIView):
 class LoginTokenView(TokenViewBase):
     """ jwt登录视图 按照TokenObtainPairView重写为自己调用的视图"""
     serializer_class = MyTokenObtainPairSerializer
+
+
+class RealNameView(APIView):
+    """用户信息视图"""
+    def get(self, request):
+        username = request.GET.get("username")
+        cursor = connection.cursor()  # 连接数据库对象
+
+        # select * from student where id = username
+        # student = Student.objects.filter(id=username)  # 拿出的是QuerySet，返回前端好用，或者value_list(value)拿到的也是queryset
+        cursor.execute("SELECT name FROM gdut_student WHERE id = %s", username)
+        student_name = cursor.fetchone()
+        if student_name is not None:
+            return Response({"username_realname": student_name + "同学"})
+
+        # select * from teacher where id = username
+        # teacher = Teacher.objects.filter(id=username)
+        cursor.execute("SELECT name FROM gdut_teacher WHERE id = %s", username)
+        teacher_name = cursor.fetchone()
+        if teacher_name is not None:
+            return Response({"username_realname": teacher_name + "老师"})
+        return Response({'message': 'username错误'}, status=status.HTTP_400_BAD_REQUEST)

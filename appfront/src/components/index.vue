@@ -71,7 +71,7 @@
           </bk-popover>
           <bk-popover theme="light navigation-message" :arrow="false" offset="-20, 10" placement="bottom-start" :tippy-options="{ 'hideOnClick': false }">
             <div class="header-user" :class="{ 'is-left': curNav.nav === 'left-right' }">
-              锤福林
+              {{username_realname}}
               <i class="bk-icon icon-down-shape"></i>
             </div>
             <template slot="content">
@@ -109,7 +109,7 @@
                 :disabled="child.disabled"
                 :icon="child.icon"
                 :default-active="child.active">
-                <span>{{child.name}}</span>
+                <span>{{<child></child>name}}</span>
               </bk-navigation-menu-item>
             </div>
           </bk-navigation-menu-item>
@@ -123,8 +123,9 @@
 </template>
 
 <script>
-import '../../static/js/host'
 import { bkNavigation, bkNavigationMenu, bkNavigationMenuItem, bkSelect, bkOption, bkPopover, bkButton } from 'bk-magic-vue'
+import axios from 'axios'
+import {host} from '../../static/js/host'
 export default {
   name: 'monitor-navigation',
   // host,
@@ -139,6 +140,7 @@ export default {
   },
   data () {
     return {
+      username_realname: 'USER',
       nav: {
         list: [
           {
@@ -154,82 +156,89 @@ export default {
             ]
           },
           {
-            name: '测试页',
+            name: '学院',
             icon: 'icon-tree-group-shape',
             url: '/bp/',
             group: true
           },
           {
-            name: '测试页二',
+            name: '专业',
             icon: 'icon-tree-module-shape',
-            url: '/component/',
-            disabled: true
-
+            url: '/component/'
           },
           {
-            name: '测试页三',
+            name: '教师',
             icon: 'icon-tree-process-shape',
             url: '/uptime_check/summary/'
           },
           {
-            name: 'aaaa',
-            icon: 'icon-weixin-shape',
-            url: '/operation_monitor/'
-          },
-          {
-            name: '一级菜单',
-            icon: 'icon-tree-process-shape',
-            url: '/config/',
+            name: '学生',
+            icon: 'icon-qq-shape',
+            url: '/operation_monitor/',
             children: [
               {
-                name: '二级菜单1'
+                name: '学生信息'
               },
               {
-                name: '二级菜单2',
-                children: [
-                  {
-                    name: '监控配置22'
-                  },
-                  {
-                    name: '监控配置23'
-                  }
-                ]
-              },
-              {
-                name: '二级菜单3'
-              },
-              {
-                name: '二级菜单4'
-              },
-              {
-                name: '二级菜单5'
+                name: '课程信息'
               }
             ]
           },
           {
-            name: '保时捷',
+            name: '班级',
             icon: 'icon-clock-shape',
-            url: '/datasource/',
-            children: []
+            url: '/datasource/'
           },
           {
-            name: '阿斯顿马丁',
-            icon: 'icon-qq-shape',
-            url: '/event_center/list/'
-          },
-          {
-            name: '兰博基尼',
+            name: '教研室',
             icon: 'icon-empty-shape',
-            url: '/biz_manage/'
-          },
-          {
-            name: '法拉利',
-            icon: 'icon-apps-shape',
-            url: '/dashboard/',
+            url: '/biz_manage/',
             group: true
           },
+          // {
+          //   name: '一级菜单',
+          //   icon: 'icon-tree-process-shape',
+          //   url: '/config/',
+          //   disabled: true,
+          //   children: [
+          //     {
+          //       name: '二级菜单1'
+          //     },
+          //     {
+          //       name: '二级菜单2',
+          //       children: [
+          //         {
+          //           name: '监控配置22'
+          //         },
+          //         {
+          //           name: '监控配置23'
+          //         }
+          //       ]
+          //     },
+          //     {
+          //       name: '二级菜单3'
+          //     },
+          //     {
+          //       name: '二级菜单4'
+          //     },
+          //     {
+          //       name: '二级菜单5'
+          //     }
+          //   ]
+          // },
           {
-            name: '测试',
+            name: '账户信息',
+            icon: 'icon-apps-shape',
+            url: '/dashboard/',
+            disabled: true
+          },
+          {
+            name: '设置',
+            icon: 'icon-apps-shape',
+            url: '/dashboard/'
+          },
+          {
+            name: '操作日志',
             icon: 'icon-weixin-shape',
             url: '/blank/'
           }
@@ -237,61 +246,17 @@ export default {
         id: '首页',
         toggle: false,
         submenuActive: false,
-        title: 'DBA教务平台'
+        title: 'GDUT-DBA教务平台'
       },
       header: {
-        list: [
-          {
-            name: '作业平台',
-            id: 1,
-            show: true
-          },
-          {
-            name: '配置平台',
-            id: 2,
-            show: true
-          },
-          {
-            name: '监控平台',
-            id: 3,
-            show: true,
-            navList: [
-              {
-                name: '插件管理',
-                id: 1
-              },
-              {
-                name: '采集配置',
-                id: 2
-              },
-              {
-                name: '策略配置',
-                id: 3
-              },
-              {
-                name: '事件中心',
-                id: 4
-              }
-            ]
-          },
-          {
-            name: '蓝盾平台',
-            id: 4,
-            show: true
-          }
-        ],
         selectList: [
           {
-            name: '英雄联盟',
+            name: '学院信息',
             id: 1
           },
           {
-            name: '和平精英',
+            name: '个人课程',
             id: 2
-          },
-          {
-            name: '王者荣耀',
-            id: 3
           }
         ],
         active: 2,
@@ -308,14 +273,6 @@ export default {
             date: '45分钟前'
           },
           {
-            message: '你的“20181212112308”单据部分被驳回',
-            date: '3天前'
-          },
-          {
-            message: '你的“20181212112308”单据部分被驳回',
-            date: '12月14日'
-          },
-          {
             message: 'jinnyyang 提醒了你',
             date: '12月14日'
           }
@@ -323,17 +280,15 @@ export default {
       },
       user: {
         list: [
-          '项目管理',
+          '个人信息管理',
           '权限中心',
           '退出登录'
         ]
       },
       help: {
         list: [
-          '产品文档',
-          '版本日志',
           '问题反馈',
-          '开源社区'
+          '权限请求'
         ]
       },
       lang: {
@@ -356,16 +311,33 @@ export default {
     }
   },
   mounted () {
-    /* 以下代码是为了自适应例子父级的宽高而设置 */
-    this.handleResize()
-    window.addEventListener('resize', this.handleResize)
-    /* 以上代码是为了自适应例子父级的宽高而设置 */
     // 未登录跳转回登录页面逻辑
-    if ((sessionStorage.username || localStorage.username) && (sessionStorage.token || localStorage.token)) {
+    var username = sessionStorage.username || localStorage.username // 注意取的是Storage的信息
+    if (username && (sessionStorage.token || localStorage.token)) {
       console.log('登录了')
     } else {
       this.$router.push('/login')
     }
+    if (username === 'admin') {
+      this.username_realname = 'ADMIN超级管理员'
+    } else {
+      axios.get(host + '/get_username_realname/', {responseType: 'json',
+        params: {username: username}}).then(
+        response => {
+          this.username_realname = response.data.username_realname
+          console.log('Your name:' + this.username_realname)
+        }).catch(error => {
+        if (error.response.status === 400) {
+          this.errorInfoBox(error.response.data.message)
+        } else {
+          console.log(error.response.data)
+        }
+      })
+    }
+    /* 以下代码是为了自适应例子父级的宽高而设置 */
+    this.handleResize()
+    window.addEventListener('resize', this.handleResize)
+    /* 以上代码是为了自适应例子父级的宽高而设置 */
   },
   beforeDestroy () {
     /* 以下代码是为了自适应例子父级的宽高而设置 */

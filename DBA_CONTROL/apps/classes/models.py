@@ -32,7 +32,7 @@ class Grade(BaseModel):
         verbose_name_plural = verbose_name
 
 
-class Teach_research_office:
+class Teach_research_office(BaseModel):
     """教研室模型类"""
     """ SQL: 
     create table Teach_research_office(
@@ -46,7 +46,8 @@ class Teach_research_office:
     id = models.CharField(primary_key=True, max_length=20, verbose_name='教研室ID')
     college_id = models.CharField(max_length=20, verbose_name='学院ID')
     count = models.IntegerField(verbose_name='可容纳人数')
-    location = models.TextField(max_length=256, unique=True, verbose_name='地理位置')
+    location = models.CharField(max_length=100, unique=True, verbose_name='地理位置')
+    # 官网：because unique implies the creation of an index.
     content = models.TextField(max_length=256, blank=True, verbose_name='备注')
 
     class Meta:
