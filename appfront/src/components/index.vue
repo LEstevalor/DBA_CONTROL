@@ -63,9 +63,9 @@
             </div>
             <template slot="content">
               <ul class="monitor-navigation-admin">
-                <li class="nav-item" v-for="name in help.list" :key="name">
-                  {{name}}
-                </li>
+                <div class="nav-item" v-for="name in help.list" :key="name">
+                  {{ name }}
+                </div>
               </ul>
             </template>
           </bk-popover>
@@ -122,6 +122,8 @@
         </bk-navigation-menu>
       </template>
       <div class="monitor-navigation-content">
+        <img src="../assets/TEGNOLOGY2.jpg" style="float:left;"/>
+        <bk-swiper :pics="pics" :loop-time="4000" class="swiper" style="float:right;"></bk-swiper>
 
       </div>
     </bk-navigation>
@@ -129,9 +131,15 @@
 </template>
 
 <script>
-import { bkNavigation, bkNavigationMenu, bkNavigationMenuItem, bkSelect, bkOption, bkPopover, bkButton } from 'bk-magic-vue'
+import { bkNavigation, bkNavigationMenu, bkNavigationMenuItem, bkSelect, bkOption, bkPopover, bkButton, bkSwiper }
+  from 'bk-magic-vue'
 import axios from 'axios'
 import {host} from '../../static/js/host'
+import firstSwiper from '../assets/china2023.jpg'
+import secondSwiper from '../assets/gdut_label.jpg'
+import thirdSwiper from '../assets/db.jpg'
+import fourthSwiper from '../assets/nosql.jpg'
+import fifthSwiper from '../assets/machine.jpg'
 
 export default {
   name: 'monitor-navigation',
@@ -142,7 +150,8 @@ export default {
     bkSelect,
     bkOption,
     bkPopover,
-    bkButton
+    bkButton,
+    bkSwiper // 轮播图
   },
   data () {
     return {
@@ -294,7 +303,15 @@ export default {
             id: 'chinese'
           }
         ]
-      }
+      },
+      pics: [
+        // { url: firstSwiper, link: 'https://www.npmjs.com/package/bk-magic-vue' },
+        { url: firstSwiper },
+        { url: secondSwiper },
+        { url: thirdSwiper },
+        { url: fourthSwiper },
+        { url: fifthSwiper }
+      ]
     }
   },
   computed: {

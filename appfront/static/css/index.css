@@ -1,3 +1,9 @@
+.swiper {
+  width: 76%;
+  height: 75%;
+  z-index: 2;
+}
+
 .monitor-navigation-header{
 -webkit-box-flex:1;
 -ms-flex:1;
