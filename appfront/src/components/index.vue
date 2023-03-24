@@ -124,8 +124,9 @@
       <div class="monitor-navigation-content">
         <img src="../assets/TEGNOLOGY2.jpg" style="float:left;"/>
         <bk-swiper :pics="pics" :loop-time="4000" class="swiper" style="float:right;"></bk-swiper>
-
+        <h1>KEY: 数据库  存储  SQL  NOSQL  MYSQL  REDIS  安全  并发  缓存  内存  服务  集群</h1>
       </div>
+      <fx67ll-binary-clock :isShowTime="true" :zoomSize="1"></fx67ll-binary-clock>
     </bk-navigation>
   </div>
 </template>
