@@ -62,7 +62,6 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
         return attrs
 
-
     def create(self, validated_data):
         del validated_data['password2']  # 入库并不需要该字段
 

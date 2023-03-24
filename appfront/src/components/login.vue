@@ -46,6 +46,7 @@
           <div style='text-align: center;margin-top: 35px;'>
               <input type='submit' class='button' value='Register' @click.prevent='trueRegister'>
               <input type='reset' class='button' value='Reset'>
+              <input type='submit' class='button' value='Back login' @click.prevent='backLogin'>
           </div>
         </form>
       </div>
@@ -119,6 +120,9 @@ export default {
             this.errorInfoBox(error.response.data.message) // 展示发送短信错误提示
           } else {
             console.log(error.response.data)
+            this.errorInfoBox('登录失败')
+            this.username = ''
+            this.password = ''
           }
         })
       }
@@ -136,7 +140,14 @@ export default {
       })
     },
     register () {
+      this.username = ''
+      this.password = ''
       this.page = 'register'
+    },
+    backLogin () {
+      this.username = ''
+      this.password = ''
+      this.page = 'login'
     },
     check_sms_code () {
       return !this.sms_code

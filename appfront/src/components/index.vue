@@ -76,9 +76,15 @@
             </div>
             <template slot="content">
               <ul class="monitor-navigation-admin">
-                <li class="nav-item" v-for="userItem in user.list" :key="userItem">
-                  {{userItem}}
-                </li>
+<!--                <div class="nav-item" v-for="userItem in user.list" :key="userItem">-->
+<!--                  <div id='self-information' @click="information">个人信息</div>-->
+<!--                </div>-->
+<!--                <div class="nav-item" v-for="userItem in user.list" :key="userItem">-->
+<!--                  <div id='control' @click="control">权限中心</div>-->
+<!--                </div>-->
+                <div class="nav-item" v-for="userItem in user.list" :key="userItem">
+                  <div id='login-out' @click="login_out">退出登录</div>
+                </div>
               </ul>
             </template>
           </bk-popover>
@@ -126,9 +132,9 @@
 import { bkNavigation, bkNavigationMenu, bkNavigationMenuItem, bkSelect, bkOption, bkPopover, bkButton } from 'bk-magic-vue'
 import axios from 'axios'
 import {host} from '../../static/js/host'
+
 export default {
   name: 'monitor-navigation',
-  // host,
   components: {
     bkNavigation,
     bkNavigationMenu,
@@ -265,24 +271,14 @@ export default {
       message: {
         list: [
           {
-            message: '你的“20181212112308”单据已通过',
-            date: '刚刚'
-          },
-          {
-            message: '你的“20181212112308”单据被驳回',
-            date: '45分钟前'
-          },
-          {
-            message: 'jinnyyang 提醒了你',
-            date: '12月14日'
+            message: '暂无信息'
+            // date: '12月14日'
           }
         ]
       },
       user: {
         list: [
-          '个人信息管理',
-          '权限中心',
-          '退出登录'
+          '个人信息管理'
         ]
       },
       help: {
@@ -345,6 +341,12 @@ export default {
     /* 以上代码是为了自适应例子父级的宽高而设置 */
   },
   methods: {
+    login_out () {
+      // 清除客户端信息
+      sessionStorage.clear()
+      localStorage.clear()
+      this.$router.push('/login') // 刷新一下
+    },
     handleSelect (id, item) {
       this.nav.id = id
       console.info(`你选择了${id}`)
