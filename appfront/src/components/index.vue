@@ -136,6 +136,9 @@ export default {
   data () {
     return {
       username_realname: 'USER',
+      status: 'USER',
+      username: localStorage.username || sessionStorage.username,
+      token: localStorage.token || sessionStorage.token,
       nav: {
         list: [
           {
@@ -302,17 +305,33 @@ export default {
   },
   mounted () {
     // 未登录跳转回登录页面逻辑
-    var username = sessionStorage.username || localStorage.username // 注意取的是Storage的信息
-    if (username && (sessionStorage.token || localStorage.token)) {
-      console.log('登录了')
+    this.username = localStorage.username || sessionStorage.username // 注意取的是Storage的信息
+    this.token = localStorage.token || sessionStorage.token
+    console.log(this.username)
+    console.log(this.token)
+    if (this.username && this.token) {
+      // 判断登录状态，通过JWT，判断username是否有效，token是否有效
+      axios.get(host + '/check_user/', {
+        // 向后端传递JWT token的方法
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json'
+      })
+        .then(response => {
+          console.log('登录状态正确')
+        }).catch(error => {
+          console.log(error.response.data)
+          this.$router.push('/login')
+        })
     } else {
       this.$router.push('/login')
     }
-    if (username === 'admin') {
+    if (this.username === 'admin') {
       this.username_realname = 'ADMIN超级管理员'
     } else {
       axios.get(host + '/get_username_realname/', {responseType: 'json',
-        params: {username: username}}).then(
+        params: {username: this.username}}).then(
         response => {
           this.username_realname = response.data.username_realname
           console.log('Your name:' + this.username_realname)
@@ -324,6 +343,7 @@ export default {
         }
       })
     }
+    this.get_status() // 获取权限级别
     /* 以下代码是为了自适应例子父级的宽高而设置 */
     this.handleResize()
     window.addEventListener('resize', this.handleResize)
@@ -335,6 +355,23 @@ export default {
     /* 以上代码是为了自适应例子父级的宽高而设置 */
   },
   methods: {
+    get_status () { // 返回权限状态
+      axios.get(host + '/status/', {
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json',
+        params: {username: this.username}
+      })
+        .then(response => {
+          this.status = response.data.status
+          console.log('获取到权限状态:' + this.status)
+          sessionStorage.status = this.status // 后端必须加判断，否则有风险
+        }).catch(error => {
+          console.log('获取不到权限状态')
+          console.log(error.response.data)
+        })
+    },
     checkout (obj) {
       if (obj === '首页') {
         this.$router.push('/top')

@@ -5,7 +5,8 @@ from django.conf import settings
 from random import randint
 from django.core.mail import send_mail
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework.generics import CreateAPIView, RetrieveAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from django_redis import get_redis_connection
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ from DBA_CONTROL.utils import constants
 from DBA_CONTROL.utils.tools import is_valid_email
 from cmts.models import Student, Teacher
 from user.models import User
-from user.serializers import CreateUserSerializer, MyTokenObtainPairSerializer
+from user.serializers import CreateUserSerializer, MyTokenObtainPairSerializer, UserDetailSerializer
 
 logger = logging.getLogger('django')
 
@@ -113,3 +114,27 @@ class RealNameView(APIView):
         if teacher_name is not None:
             return Response({"username_realname": (teacher_name[0] + "老师")})
         return Response({'message': 'username错误'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserView(RetrieveAPIView):
+    """⽤户登录信息鉴定"""
+    serializer_class = UserDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    # 重写get_object方法返回给前端字段，否则会报queryset的错误
+    def get_object(self):
+        return self.request.user
+
+
+class StatusView(APIView):
+    """权限获取视图"""
+    def get(self, request):
+        username = request.GET.get("username")
+        cursor = connection.cursor()  # 连接数据库对象
+        # select level from gdut_users where username = username  字符串这里需要加''在数据库中，'admin'或3120006969生效（数字可不需）
+        cursor.execute("SELECT level FROM gdut_users WHERE username = '%s'" % username)
+        level = cursor.fetchone()
+        if level is not None:
+            return Response({"status": level[0]})
+        else:
+            return Response({'message': '搜取不到权限'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

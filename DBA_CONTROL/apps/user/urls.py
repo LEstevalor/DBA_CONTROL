@@ -13,4 +13,8 @@ urlpatterns = (
     url(r'^login/$', views.LoginTokenView.as_view(), name='token_obtain_pair'),     # JWT登录功能
 
     url(r'^get_username_realname/$', views.RealNameView.as_view()),  # 获取真实姓名
+
+    url(r'^check_user/$', views.UserView.as_view()),  # 判断前端用户状态是否正确
+
+    url(r'^status/$', views.StatusView.as_view()),  # 获取权限级别
 )

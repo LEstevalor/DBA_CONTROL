@@ -82,6 +82,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
 
 
 class MyTokenObtainPairSerializer(TokenObtainSerializer):
+    """jwt序列化器"""
     @classmethod
     def get_token(cls, user):
         return RefreshToken.for_user(user)
@@ -95,3 +96,11 @@ class MyTokenObtainPairSerializer(TokenObtainSerializer):
         data['token'] = data['access']
         data['username'] = self.user.username
         return data
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    """⽤户详细信息序列化器"""
+    class Meta:
+        model = User
+        # 对应前端需要返回的字段即可
+        fields = ['username']
