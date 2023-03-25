@@ -100,24 +100,14 @@
           <bk-navigation-menu-item
             v-for="item in nav.list"
             :key="item.name"
-            :has-child="item.children && !!item.children.length"
             :group="item.group"
             :icon="item.icon"
             :disabled="item.disabled"
             :url="item.url"
-            :id="item.name">
+            :id="item.name"
+          v-on:click="checkout(item.name)">
+<!--            :@click="checkout(item.name)">  &lt;!&ndash;通过ID绑定函数，遍历绑定id&ndash;&gt;-->
             <span>{{item.name}}</span>
-            <div slot="child">
-              <bk-navigation-menu-item
-                :key="child.name"
-                v-for="child in item.children"
-                :id="child.name"
-                :disabled="child.disabled"
-                :icon="child.icon"
-                :default-active="child.active">
-                <span>{{<child></child>name}}</span>
-              </bk-navigation-menu-item>
-            </div>
           </bk-navigation-menu-item>
         </bk-navigation-menu>
       </template>
@@ -345,6 +335,29 @@ export default {
     /* 以上代码是为了自适应例子父级的宽高而设置 */
   },
   methods: {
+    checkout (obj) {
+      if (obj === '首页') {
+        this.$router.push('/top')
+      } else if (obj === '学院') {
+        this.$router.push('/college')
+      } else if (obj === '专业') {
+        this.$router.push('/major')
+      } else if (obj === '教师') {
+        this.$router.push('/teacher')
+      } else if (obj === '学生信息') {
+        this.$router.push('/student')
+      } else if (obj === '班级') {
+        this.$router.push('/grade')
+      } else if (obj === '课程信息') {
+        this.$router.push('/course')
+      } else if (obj === '教研室') {
+        this.$router.push('/teach_student_class')
+      } else if (obj === '设置') {
+        this.$router.push('/setting')
+      } else if (obj === '操作日志') {
+        this.$router.push('/log')
+      }
+    },
     login_out () {
       // 清除客户端信息
       sessionStorage.clear()

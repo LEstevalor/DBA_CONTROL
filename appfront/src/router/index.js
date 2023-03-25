@@ -25,6 +25,46 @@ export default new Router({
           path: '/college',
           name: 'index.college',
           component: () => import('../components/college.vue')
+        },
+        {
+          path: '/major',
+          name: 'index.major',
+          component: () => import('../components/major.vue')
+        },
+        {
+          path: '/teacher',
+          name: 'index.teacher',
+          component: () => import('../components/teacher.vue')
+        },
+        {
+          path: '/student',
+          name: 'index.student',
+          component: () => import('../components/student.vue')
+        },
+        {
+          path: '/grade',
+          name: 'index.grade',
+          component: () => import('../components/grade.vue')
+        },
+        {
+          path: '/course',
+          name: 'index.course',
+          component: () => import('../components/course.vue')
+        },
+        {
+          path: '/teach_student_class',
+          name: 'index.teach_student_class',
+          component: () => import('../components/teach_student_class.vue')
+        },
+        {
+          path: '/setting',
+          name: 'index.setting',
+          component: () => import('../components/setting.vue')
+        },
+        {
+          path: '/log',
+          name: 'index.log',
+          component: () => import('../components/log.vue')
         }
       ]
     },
