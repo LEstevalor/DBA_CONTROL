@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     url(r'^', include('user.urls')),  # 用户模块
+    url(r'^', include('cmts.urls')),  # 学院专业教师学生模块
 ]

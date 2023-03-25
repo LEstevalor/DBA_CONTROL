@@ -14,7 +14,7 @@ from rest_framework_simplejwt.views import TokenViewBase
 
 from DBA_CONTROL.utils import constants
 from DBA_CONTROL.utils.tools import is_valid_email
-from cmts.models import Student, Teacher
+# from cmts.models import Student, Teacher
 from user.models import User
 from user.serializers import CreateUserSerializer, MyTokenObtainPairSerializer, UserDetailSerializer
 
