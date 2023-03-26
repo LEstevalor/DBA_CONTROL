@@ -1,14 +1,13 @@
 from django.db import connection
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.mixins import DestroyModelMixin, UpdateModelMixin
+from rest_framework.mixins import DestroyModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from classes.models import Grade
 from cmts.models import College, Teacher, Major
-from cmts.serializers import CollegeSerializer, MajorSerializer
+from cmts.serializers import CollegeSerializer, MajorSerializer, TeacherSerializer
 
 
 class CollegeViewSet(DestroyModelMixin, GenericViewSet):
@@ -71,19 +70,20 @@ class CollegeViewSet(DestroyModelMixin, GenericViewSet):
     def search(self, request):
         data = []
         cursor = connection.cursor()
+        sql = ''
         if 'college_name' in request.GET:
             college_name = '%' + request.GET.get('college_name') + '%'  # 需要%s为'%s'，否则识别不出来
-            cursor.execute("select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id and c.name like '%s'" % college_name)
+            sql = "select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id and c.name like '%s'" % college_name
         elif 'dean_name' in request.GET:
             dean_name = '%' + request.GET.get('dean_name') + '%'
-            cursor.execute("select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id and t.name like '%s'" % dean_name)
+            sql = "select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id and t.name like '%s'" % dean_name
         elif 'content' in request.GET:
             content = '%' + request.GET.get('content') + '%'
-            cursor.execute("select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id and c.content like '%s'" % content)
+            sql = "select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id and c.content like '%s'" % content
         else:
             return Response({"message": "搜索信息有误"}, status=status.HTTP_400_BAD_REQUEST)  # 搜索信息为空的情况在前端已被拦
-        tuples = cursor.fetchall()
-        for tup in tuples:
+        cursor.execute(sql)
+        for tup in cursor.fetchall():
             data.append({"id": tup[0], "ip": tup[1], "source": tup[2], "content": tup[3]})
         return Response({'college': data})
 
@@ -174,3 +174,91 @@ class MajorViewSet(DestroyModelMixin, GenericViewSet):
             count = cursor.fetchone()[0]
             data.append({"id": tup[0], "ip": tup[1], "source": tup[2], "content": tup[3], "count": count})
         return Response({'major': data})
+
+
+class TeacherViewSet(DestroyModelMixin, GenericViewSet):
+    """教师信息增删改查 模糊查"""
+    # destroy只需教师ID
+    # update涉及更改学院，create也涉及学院，list同理，模糊查√
+    permission_classes = [IsAuthenticated]
+    serializer_class = TeacherSerializer
+
+    def get_queryset(self):
+        # select * from major
+        return Teacher.objects.all()
+
+    # GET /teacher/
+    def list(self, request, *args, **kwargs):
+        cursor = connection.cursor()
+        sql = "select t.id, t.name, c.name, t.content from gdut_teacher t, gdut_college c where t.college_id = c.id"
+        cursor.execute(sql)
+        data = []
+        for tup in cursor.fetchall():
+            data.append({"id": tup[0], "ip": tup[1], "source": tup[2], "content": tup[3]})
+        return Response({'teacher': data})
+
+    # POST /teacher/
+    # POST请求方式，数据为全新新增的，故不需要带*args, **kwargs
+    # 学院名称是否存在，教师ID是否存在过（存在再添加就矛盾了）
+    def create(self, request):
+        # select count(*) from gdut_teacher where name = name;  -- 传入的name就是major name
+        if Teacher.objects.filter(name=request.data["id"]).count() > 0:
+            return Response({"message": "教师号已存在，请勿重复添加"}, status=status.HTTP_400_BAD_REQUEST)
+        if len(request.data['id']) != 10:
+            return Response({"message": "教师工号必须为10位"}, status=status.HTTP_400_BAD_REQUEST)
+
+        cursor = connection.cursor()
+        cursor.execute("select id from gdut_college where name = '%s'" % request.data["college_name"])
+        tuple_info = cursor.fetchone()
+        if tuple_info is None:
+            return Response({"message": "学院不存在"}, status=status.HTTP_400_BAD_REQUEST)
+
+        request.data['college_id'] = tuple_info[0]
+        request.data.pop("college_name")
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    # PUT /teacher/<pk>/JSON内容
+    # 只可改变所属学院和content
+    def update(self, request, *args, **kwargs):
+        cursor = connection.cursor()
+        cursor.execute("select id from gdut_college where name = '%s'" % request.data["college_name"])
+        tuple_info = cursor.fetchone()
+        if tuple_info is None:
+            return Response({"message": "学院不存在"}, status=status.HTTP_400_BAD_REQUEST)
+
+        college_id = tuple_info[0]
+
+        cursor.execute("update gdut_teacher set college_id = %s, content='%s' where id = '%s'" %
+                       (college_id, request.data["content"], request.data["id"]))
+        return Response(status=status.HTTP_200_OK)
+
+    # GET /teacher/search/?xxx 模糊查询
+    @action(methods=['get'], detail=False)
+    def search(self, request):
+        data = []
+        cursor = connection.cursor()
+        if 'college_name' in request.GET:
+            college_name = '%' + request.GET.get('college_name') + '%'
+            sql = "select t.id, t.name, c.name, t.content from gdut_teacher t, gdut_college c where t.college_id = c.id and c.name like '%s'" % college_name
+        elif 'name' in request.GET:
+            name = '%' + request.GET.get('name') + '%'
+            sql = "select t.id, t.name, c.name, t.content from gdut_teacher t, gdut_college c where t.college_id = c.id and t.name like '%s'" % name
+        elif 'id' in request.GET:
+            id = '%' + request.GET.get('id') + '%'
+            sql = "select t.id, t.name, c.name, t.content from gdut_teacher t, gdut_college c where t.college_id = c.id and t.id like '%s'" % id
+        elif 'content' in request.GET:
+            content = '%' + request.GET.get('content') + '%'
+            sql = "select t.id, t.name, c.name, t.content from gdut_teacher t, gdut_college c where t.college_id = c.id and t.content like '%s'" % content
+        else:
+            return Response({"message": "搜索信息有误"}, status=status.HTTP_400_BAD_REQUEST)  # 搜索信息为空的情况在前端已被拦
+        cursor.execute(sql)
+        for tup in cursor.fetchall():
+            data.append({"id": tup[0], "ip": tup[1], "source": tup[2], "content": tup[3]})
+        return Response({'teacher': data})
+
+
+

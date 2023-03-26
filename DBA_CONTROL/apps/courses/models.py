@@ -28,11 +28,11 @@ class Student_Course(BaseModel):
     """ SQL: 
     create table Student_Course(
         id SMALLINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',  -- django中未创建会生成自动的默认自增ID
-        course_id CHAR(20) NOT NULL COMMENT '课程ID',
+        course_id SMALLINT NOT NULL COMMENT '课程ID',
         student_id CHAR(20) NOT NULL COMMENT '学号'
     ) COMMENT='学生课程';
     """
-    course_id = models.CharField(max_length=20, verbose_name='课程ID')
+    course_id = models.IntegerField(verbose_name='课程ID')
     student_id = models.CharField(max_length=20, verbose_name='学号')
 
     class Meta:

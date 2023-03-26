@@ -10,13 +10,13 @@ class Student(BaseModel):
     create table Student(
         id CHAR(20) PRIMARY KEY COMMENT '学号',
         name CHAR(20) NOT NULL COMMENT '姓名',
-        grade_id CHAR(20) NOT NULL COMMENT '班级ID',
+        grade_id SMALLINT NOT NULL COMMENT '班级ID',
         content VARCHAR(256) COMMENT '备注'
     ) COMMENT='学生';
     """
     id = models.CharField(primary_key=True, max_length=20, verbose_name='学号')
     name = models.CharField(max_length=20, verbose_name='姓名')
-    grade_id = models.CharField(max_length=20, verbose_name='班级ID')
+    grade_id = models.IntegerField(verbose_name='班级ID')
     content = models.TextField(max_length=256, blank=True, verbose_name='备注')
 
     class Meta:
@@ -31,13 +31,13 @@ class Teacher(BaseModel):
     create table Teacher(
         id CHAR(20) PRIMARY KEY COMMENT '教师号',
         name CHAR(20) NOT NULL COMMENT '姓名',
-        college_id CHAR(20) NOT NULL COMMENT '学院ID',
+        college_id SMALLINT NOT NULL COMMENT '学院ID',
         content VARCHAR(256) COMMENT '备注'
     ) COMMENT='教师';
     """
     id = models.CharField(primary_key=True, max_length=20, verbose_name='教师号')
     name = models.CharField(max_length=20, verbose_name='姓名')
-    college_id = models.CharField(max_length=20, verbose_name='学院ID')
+    college_id = models.IntegerField(verbose_name='学院ID')
     content = models.TextField(max_length=256, blank=True, verbose_name='备注')
 
     class Meta:
@@ -72,12 +72,12 @@ class Major(BaseModel):
     create table Major(
         id SMALLINT PRIMARY KEY AUTO_INCREMENT COMMENT '专业ID', -- django中未创建会生成自动的默认自增ID
         name CHAR(50) NOT NULL COMMENT '专业名称',
-        college_id CHAR(20) NOT NULL COMMENT '学院ID',
+        college_id SMALLINT NOT NULL COMMENT '学院ID',
         content VARCHAR(256) COMMENT '备注'
     ) COMMENT='专业';
     """
     name = models.CharField(max_length=50, verbose_name='专业名称')
-    college_id = models.CharField(max_length=20, verbose_name='学院ID')
+    college_id = models.IntegerField(verbose_name='学院ID')
     content = models.TextField(max_length=256, blank=True, verbose_name='备注')
 
     class Meta:

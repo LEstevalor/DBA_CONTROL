@@ -23,6 +23,6 @@ urlpatterns = [
     url(r'^', include('user.urls')),  # 用户模块
     url(r'^', include('cmts.urls')),  # 学院专业教师学生模块
     # url(r'^', include('courses.urls')),  # 教室模块
-    # url(r'^', include('classes.urls')),  # 学生课程模块
+    url(r'^', include('classes.urls')),  # 学生课程模块
 
 ]

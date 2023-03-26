@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from cmts.models import College, Major
+from cmts.models import College, Major, Teacher
 
 
 class CollegeSerializer(serializers.ModelSerializer):
@@ -18,4 +18,11 @@ class MajorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Major
+        fields = ['id', 'name', 'college_id', 'content']
+
+
+class TeacherSerializer(serializers.ModelSerializer):
+    """教师信息序列化器"""
+    class Meta:
+        model = Teacher
         fields = ['id', 'name', 'college_id', 'content']

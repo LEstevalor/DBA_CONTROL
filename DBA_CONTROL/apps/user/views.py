@@ -102,14 +102,14 @@ class RealNameView(APIView):
 
         # select * from student where id = username
         # student = Student.objects.filter(id=username)  # 拿出的是QuerySet，返回前端好用，或者value_list(value)拿到的也是queryset
-        cursor.execute("SELECT name FROM gdut_student WHERE id = %s" % username)
+        cursor.execute("SELECT name FROM gdut_student WHERE id = '%s'" % username)
         student_name = cursor.fetchone()
         if student_name is not None:
             return Response({"username_realname": (student_name[0] + "同学")})
 
         # select * from teacher where id = username
         # teacher = Teacher.objects.filter(id=username)
-        cursor.execute("SELECT name FROM gdut_teacher WHERE id = %s" % username)
+        cursor.execute("SELECT name FROM gdut_teacher WHERE id = '%s'" % username)
         teacher_name = cursor.fetchone()
         if teacher_name is not None:
             return Response({"username_realname": (teacher_name[0] + "老师")})
