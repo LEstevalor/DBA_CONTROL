@@ -181,12 +181,13 @@ export default {
           },
           responseType: 'json'
         }).then(response => {
+          // console.log(response.data)
+          // console.log(Number(response.data.id))
           this.data.push({
             'ip': this.create_college_name,
             'source': this.create_dean_name,
             'content': this.create_content,
-            'id': Number(this.create_dean_id),
-            'selected': false
+            'id': Number(response.data.id)
           })
         }).catch(error => {
           alert(error.response.data.message)

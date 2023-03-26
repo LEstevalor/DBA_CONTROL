@@ -50,14 +50,13 @@ class College(BaseModel):
     """学院模型类"""
     """ SQL: 
     create table College(
-        id CHAR(20) PRIMARY KEY COMMENT '学院ID',
+        id SMALLINT PRIMARY KEY AUTO_INCREMENT COMMENT '学院ID', -- django中未创建会生成自动的默认自增ID
         name CHAR(50) UNIQUE NOT NULL COMMENT '学院名',
         dean_id CHAR(20) NOT NULL COMMENT '院长ID',
         content VARCHAR(256) COMMENT '备注'
     ) COMMENT='学院';
     """
-    id = models.CharField(primary_key=True, max_length=20, verbose_name='学院ID')
-    name = models.CharField(max_length=50, unique=True,verbose_name='学院名')
+    name = models.CharField(max_length=50, unique=True, verbose_name='学院名')
     dean_id = models.CharField(max_length=20, verbose_name='院长ID')
     content = models.TextField(max_length=256, blank=True, verbose_name='备注')
 
@@ -71,13 +70,12 @@ class Major(BaseModel):
     """专业模型类"""
     """ SQL: 
     create table Major(
-        id CHAR(20) PRIMARY KEY COMMENT '专业ID',
+        id SMALLINT PRIMARY KEY AUTO_INCREMENT COMMENT '专业ID', -- django中未创建会生成自动的默认自增ID
         name CHAR(50) NOT NULL COMMENT '专业名称',
         college_id CHAR(20) NOT NULL COMMENT '学院ID',
         content VARCHAR(256) COMMENT '备注'
     ) COMMENT='专业';
     """
-    id = models.CharField(primary_key=True, max_length=20, verbose_name='专业ID')
     name = models.CharField(max_length=50, verbose_name='专业名称')
     college_id = models.CharField(max_length=20, verbose_name='学院ID')
     content = models.TextField(max_length=256, blank=True, verbose_name='备注')
