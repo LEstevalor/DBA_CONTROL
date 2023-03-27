@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.response import Response
 
+from DBA_CONTROL.utils.tools import check_teach_name_and_id
 from classes.models import Teach_research_office, Grade
 from classes.serializers import TeachStudentClassSerializer, GradeSerializer
 
@@ -26,13 +27,6 @@ def check_major_name(cursor, major_name):
     if tuple_info is None:
         return Response({"message": "专业不存在"}, status=status.HTTP_400_BAD_REQUEST)
     return tuple_info[0]
-
-
-def check_teach_name_and_id(cursor, teacher_name, teach_id):
-    """传入connection和教师名称、教师ID，检查ID是否存在，id和name是否匹配得上，如果存在则不返回，不存在则报错404"""
-    cursor.execute("select content from gdut_teacher where id = '%s' and name = '%s'" % (teach_id, teacher_name))
-    if cursor.fetchone() is None:
-        return Response({"message": "教师ID不存在或教师名称与教师ID匹配不上"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 def check_same_grade(cursor, year, college_id, major_id, grade_number):
@@ -179,7 +173,7 @@ class GradeViewSet(DestroyModelMixin, GenericViewSet):
         cursor = connection.cursor()
         request.data['college_id'] = check_college_name(cursor, request.data["college_name"])
         request.data['major_id'] = check_major_name(cursor, request.data["major_name"])
-        check_teach_name_and_id(cursor, request.data["teacher_name"], request.data["teach_id"])
+        check_teach_name_and_id(cursor, request.data["teach_id"], request.data["teacher_name"])
         # request.data.pop("college_name") request.data.pop("major_name") request.data.pop("teacher_name")
         # request.data多余的可以不pop掉，只有序列化器有即可
         check_same_grade(cursor, request.data["year"], request.data["college_id"],
@@ -200,7 +194,7 @@ class GradeViewSet(DestroyModelMixin, GenericViewSet):
         cursor = connection.cursor()
         request.data['college_id'] = check_college_name(cursor, request.data["college_name"])
         request.data['major_id'] = check_major_name(cursor, request.data["major_name"])
-        check_teach_name_and_id(cursor, request.data["teacher_name"], request.data["teach_id"])
+        check_teach_name_and_id(cursor, request.data["teach_id"], request.data["teacher_name"])
         check_same_grade(cursor, request.data["year"], request.data["college_id"],
                          request.data["major_id"], request.data["grade_number"])
 
