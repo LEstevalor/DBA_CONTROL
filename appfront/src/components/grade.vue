@@ -215,8 +215,8 @@ export default {
         })
     },
     addData () {
-      if (this.create_year && this.create_college_name && this.create_major_name && this.create_grade_number  &&
-      this.create_teacher_name && this.create_teach_id && this.create_content && this.create_count) {
+      if (this.create_year && this.create_college_name && this.create_major_name && this.create_grade_number &&
+        this.create_teacher_name && this.create_teach_id && this.create_content && this.create_count) {
         axios.post(host + '/grade/', JSON.parse(JSON.stringify(
           {
             'year': this.create_year,
@@ -292,7 +292,7 @@ export default {
         this.errorInfoBox('不能存在输入为空')
       }
     },
-    update_init(year, college_name, major_name, grade_number, teacher_name, teach_id, content) {
+    update_init (year, college_name, major_name, grade_number, teacher_name, teach_id, content) {
       this.update_year = year
       this.update_college_name = college_name
       this.update_major_name = major_name

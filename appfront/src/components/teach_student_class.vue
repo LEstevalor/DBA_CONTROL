@@ -68,7 +68,7 @@
                   </bk-compose-form-item>
               </div>
               <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'" @click=
-                "update_init(props.row.ip, props.row.source, props.row.content, props.row.count)">修改</bk-button>
+                "update_init(props.row.ip, props.row.content, props.row.count)">修改</bk-button>
           </bk-popconfirm>
           <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="288" @confirm="removeData(props.row.id)">
               <div slot="content">
@@ -232,7 +232,7 @@ export default {
         this.errorInfoBox('不能存在输入为空')
       }
     },
-    update_init(ip, source, content, count) {
+    update_init (ip, content, count) {
       this.update_college_name = ip
       this.update_content = content
       this.update_count = count
