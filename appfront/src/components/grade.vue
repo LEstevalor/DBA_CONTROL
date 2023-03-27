@@ -1,13 +1,540 @@
 <template>
-  <div></div>
+  <div>
+     <bk-compose-form-item class="select-demo">
+       <div>&nbsp;</div>
+        <bk-select v-model="value1" style="width: 140px" size="large" :clearable="false">
+          <bk-option id="id" name="班级ID" @click="option_id"></bk-option>
+          <bk-option id="year" name="届号" @click="option_year"></bk-option>
+          <bk-option id="college_name" name="学院名称" @click="option_college_name"></bk-option>
+          <bk-option id="major_name" name="专业名称" @click="option_major_name"></bk-option>
+          <bk-option id="grade_number" name="班级号" @click="option_grade_number"></bk-option>
+          <bk-option id="teach_id" name="班主任ID" @click="option_teach_id"></bk-option>
+          <bk-option id="teacher_name" name="班主任名称" @click="option_teacher_name"></bk-option>
+          <bk-option id="count" name="班级人数" @click="option_count"></bk-option>
+          <bk-option id="content" name="班级简介" @click="option_content"></bk-option>
+        </bk-select>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'id'" key:1 placeholder="请输入班级ID" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'year'" key:2 placeholder="请输入届号" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'college_name'" key:3 placeholder="请输入学院名称" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'major_name'" key:4 placeholder="请输入专业名称" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'grade_number'" key:1 placeholder="请输入班级号" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'teach_id'" key:3 placeholder="请输入班主任ID" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'teacher_name'" key:2 placeholder="请输入班主任名称" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'count'" key:4 placeholder="班级人数" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'content'" key:4 placeholder="班级简介" :left-icon="'bk-icon icon-search'"></bk-input>
+       <bk-button type="search" theme="warning" @click="search_data" size="large">search</bk-button>
+     </bk-compose-form-item>
+     <div style="float:right;" class="container">
+      <div>&nbsp;</div>
+      <bk-button theme="primary" @click="toggleTableSize">样式设置</bk-button>
+      <span class="ml10">当前尺寸：{{ size }} &nbsp;&nbsp;&nbsp;</span>
+      <div>&nbsp;</div>
+      <div class="inner">
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="288" @confirm="addData()">
+          <div slot="content">
+              <bk-compose-form-item>
+                <h3>届号: <bk-input v-model='create_year' type='text'/></h3>
+                <h3>学院名称: <bk-input v-model='create_college_name' type='text'/></h3>
+                <h3>专业名称: <bk-input v-model='create_major_name' type='text'/></h3>
+                <h3>班级号: <bk-input v-model='create_grade_number' type='text'/></h3>
+                <h3>班主任ID: <bk-input v-model='create_teach_id' type='text'/></h3>
+                <h3>班主任名称: <bk-input v-model='create_teacher_name' type='text'/></h3>
+                <h3>班级人数: <bk-input v-model='create_count' type='text' disabled="true"/></h3>
+                <h3>班级简介: <bk-input v-model='create_content' type='text'/></h3>
+              </bk-compose-form-item>
+          </div>
+          <bk-button theme="primary" :disabled="status === 'USER'">添加</bk-button>
+        </bk-popconfirm>
+      </div>
+      &nbsp;
+    </div>
+    <div style="float:left;">
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      &nbsp;<bk-icon type="upload" />&nbsp;<bk-button theme="success" @click="load_excel()"> 数据导出</bk-button>
+    </div>
+    <bk-table style="margin-top: 15px;"
+        :data="data"
+        :size="size"
+        :pagination="pagination"
+        @page-change="handlePageChange"
+        @select="curSelected"
+        @select-all="curAllSelected">
+      <bk-table-column type="selection" width="60"></bk-table-column>  <!--可选的地方-->
+      <bk-table-column type="index" label="序列" width="60"></bk-table-column>
+      <bk-table-column label="班级ID" prop="id"></bk-table-column>
+      <bk-table-column label="届号" prop="year"></bk-table-column>
+      <bk-table-column label="学院名称" prop="college_name"></bk-table-column>
+      <bk-table-column label="专业名称" prop="major_name"></bk-table-column>
+      <bk-table-column label="班级号" prop="grade_number"></bk-table-column>
+      <bk-table-column label="班主任ID" prop="teach_id"></bk-table-column>
+      <bk-table-column label="班主任名称" prop="teacher_name"></bk-table-column>
+      <bk-table-column label="班级人数" prop="count"></bk-table-column>
+      <bk-table-column label="简介信息" prop="content"></bk-table-column>
+      <bk-table-column label="操作" width="150">
+        <template slot-scope="props">
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="288"
+                         @confirm="changeData(props.row.id, props.row.count)">
+              <div slot="content">
+                  <bk-compose-form-item>
+                    <h3>班级ID: <bk-input v-model="props.row.id" type='text' disabled="true"/></h3>
+                    <h3>届号: <bk-input v-model="update_year" type='text'/></h3>
+                    <h3>学院名称: <bk-input v-model="update_college_name" type='text'/></h3>
+                    <h3>专业名称: <bk-input v-model="update_major_name" type='text'/></h3>
+                    <h3>班级号: <bk-input v-model="update_grade_number" type='text'/></h3>
+                    <h3>班主任ID: <bk-input v-model="update_teacher_name" type='text'/></h3>
+                    <h3>班主任名称: <bk-input v-model="update_teach_id" type='text'/></h3>
+                    <h3>班级人数: <bk-input v-model="props.row.count" type='text'  disabled="true"/></h3>
+                    <h3>简介信息: <bk-input v-model="update_content" type='text'/></h3>
+                  </bk-compose-form-item>
+              </div>
+              <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'" @click=
+                "update_init(props.row.year, props.row.college_name, props.row.major_name, props.row.grade_number,
+                props.row.teacher_name, props.row.teach_id, props.row.content)">修改</bk-button>
+          </bk-popconfirm>
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="288"
+                         @confirm="removeData(props.row.id, props.row.count)">
+              <div slot="content">
+                  <div class="demo-custom">
+                      <i class="bk-icon icon-info-circle-shape pr5 content-icon"></i>
+                      <div class="content-text">确认删除？一旦删除不可回滚</div>
+                  </div>
+              </div>
+              <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'">删除</bk-button>
+          </bk-popconfirm>
+          <bk-popover class="dot-menu" placement="bottom-start" theme="dot-menu light"
+                      :trigger="props.$index % 2 === 0 ? 'click' : 'mouseenter'" :arrow="false" offset="15"
+                      :distance="0">
+            <span class="dot-menu-trigger"></span>
+          </bk-popover>
+        </template>
+      </bk-table-column>
+    </bk-table>
+  </div>
 </template>
 
 <script>
+import {bkTable, bkTableColumn, bkButton, bkPopover, bkComposeFormItem, bkInput, bkSelect, bkOption, bkColorPicker,
+  bkIcon, bkPopconfirm} from 'bk-magic-vue'
+import axios from 'axios'
+import {host} from '../../static/js/host'
+
 export default {
-  name: 'grade'
+  name: 'grade',
+  components: {
+    bkTable,
+    bkTableColumn,
+    bkButton,
+    bkPopover,
+    bkComposeFormItem,
+    bkInput,
+    bkSelect,
+    bkOption,
+    bkColorPicker,
+    bkIcon,
+    bkPopconfirm
+  },
+  data () {
+    return {
+      textcontent: '', // 搜索框输入内容
+      size: 'small',
+      data: [
+        {
+          id: '1',
+          year: '2020',
+          college_name: '数学与统计学院',
+          major_name: '信息与计算科学',
+          grade_number: '3',
+          teach_id: '1234567890',
+          teacher_name: 'xxx',
+          count: '100',
+          content: '很好'
+        },
+        {
+          id: '2',
+          year: '2020',
+          college_name: '数学与统计学院',
+          major_name: '信息与计算科学',
+          grade_number: '4',
+          teach_id: '1234567000',
+          teacher_name: 'xxx',
+          count: '88',
+          content: '比三班差一点'
+        }
+      ],
+      pagination: {
+        current: 1, // 首页
+        count: 0, // 总数
+        limit: 10 // 限制
+      },
+      value1: 'id',
+      token: localStorage.token || sessionStorage.token,
+      username: localStorage.username || sessionStorage.username,
+      status: sessionStorage.status,
+      update_year: '',
+      update_college_name: '',
+      update_major_name: '',
+      update_grade_number: '',
+      update_teacher_name: '',
+      update_teach_id: '',
+      update_content: '',
+      create_year: '',
+      create_college_name: '',
+      create_major_name: '',
+      create_grade_number: '',
+      create_teacher_name: '',
+      create_teach_id: '',
+      create_content: '',
+      create_count: '0',
+      cur_getData: true,
+      select_list: [], // 判断是否被选中的列表，被点后全部实时更新
+      select_list_all: false // 判断是否被全选
+    }
+  },
+  mounted () {
+    this.getData()
+  },
+  methods: {
+    getData () {
+      axios.get(host + '/grade/', { // 获取data列表中的数据
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json'
+      }).then(response => {
+        console.log('班级信息' + response.data)
+        this.data = response.data.grade // 列表的数据和data是绑一起的
+        this.pagination['count'] = this.data.length
+        this.cur_getData = true
+      })
+        .catch(error => {
+          console.log(error.response.data)
+        })
+    },
+    addData () {
+      if (this.create_year && this.create_college_name && this.create_major_name && this.create_grade_number  &&
+      this.create_teacher_name && this.create_teach_id && this.create_content && this.create_count) {
+        axios.post(host + '/grade/', JSON.parse(JSON.stringify(
+          {
+            'year': this.create_year,
+            'college_name': this.create_college_name,
+            'major_name': this.create_major_name,
+            'grade_number': this.create_grade_number,
+            'teacher_name': this.create_teacher_name,
+            'teach_id': this.create_teach_id,
+            'count': this.create_count,
+            'content': this.create_content
+          })), {
+          headers: {
+            'Authorization': 'Bearer ' + this.token
+          },
+          responseType: 'json'
+        }).then(response => {
+          this.data.push({
+            'id': response.data.id,
+            'year': this.create_year,
+            'college_name': this.create_college_name,
+            'major_name': this.create_major_name,
+            'grade_number': this.create_grade_number,
+            'teacher_name': this.create_teacher_name,
+            'teach_id': this.create_teach_id,
+            'count': this.create_count,
+            'content': this.create_content
+          })
+        }).catch(error => {
+          alert(error.response.data.message)
+          console.log(error.response.data.message)
+        })
+      } else {
+        this.errorInfoBox('不能存在输入为空')
+      }
+    },
+    changeData (id, count) {
+      if (this.update_year && this.update_college_name && this.update_major_name && this.update_grade_number
+      && this.update_teacher_name && this.update_teach_id && this.update_content) {
+        axios.put(host + '/grade/' + id + '/', JSON.parse(JSON.stringify(
+          {
+            'id': id,
+            'year': this.update_year,
+            'college_name': this.update_college_name,
+            'major_name': this.update_major_name,
+            'grade_number': this.update_grade_number,
+            'teacher_name': this.update_teacher_name,
+            'teach_id': this.update_teach_id,
+            'content': this.update_content,
+            'count': count
+          })), {
+          headers: {
+            'Authorization': 'Bearer ' + this.token
+          },
+          responseType: 'json'
+        }).then(response => {
+          for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i].id === id) { // 修改
+              this.data[i].year = this.update_year
+              this.data[i].college_name = this.update_college_name
+              this.data[i].major_name = this.update_major_name
+              this.data[i].grade_number = this.update_grade_number
+              this.data[i].teacher_name = this.update_teacher_name
+              this.data[i].teach_id = this.update_teach_id
+              this.data[i].content = this.update_content
+              break
+            }
+          }
+        }).catch(error => {
+          alert(error.response.data.message)
+          console.log(error.response.data.message)
+        })
+      } else {
+        this.errorInfoBox('不能存在输入为空')
+      }
+    },
+    update_init(year, college_name, major_name, grade_number, teacher_name, teach_id, content) {
+      this.update_year = year
+      this.update_college_name = college_name
+      this.update_major_name = major_name
+      this.update_grade_number = grade_number
+      this.update_teacher_name = teacher_name
+      this.update_teach_id = teach_id
+      this.update_content = content
+    },
+    removeData (id, count) {
+      // 删除数据
+      axios.delete(host + '/grade/' + id + '/', {
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json',
+        params: {count: count}
+      }).then(response => {
+        for (let i = 0; i < this.data.length; i++) {
+          if (this.data[i].id === id) { // 从数组中移除地址
+            this.data.splice(i, 1)
+            break
+          }
+        }
+      }).catch(error => {
+        console.log(error.response.data)
+      })
+    },
+    search_data () { // 通过v-model绑定的textcontent获取文本内容，通过下滑框对应的value1获取下拉框选择的对象  搜索数据
+      if (!this.textcontent) {
+        this.handleSingle('欢迎使用GDUT DBA', '龙洞小助手提醒您搜索内容请有所输入，否则还是原信息')
+        if (!this.cur_getData) {
+          this.getData()
+        }
+      } else {
+        let param = ''
+        if (this.value1 === 'id') {
+          param = {id: this.textcontent}
+        } else if (this.value1 === 'year') {
+          param = {year: this.textcontent}
+        } else if (this.value1 === 'college_name') {
+          param = {college_name: this.textcontent}
+        } else if (this.value1 === 'major_name') {
+          param = {major_name: this.textcontent}
+        } else if (this.value1 === 'grade_number') {
+          param = {grade_number: this.textcontent}
+        } else if (this.value1 === 'teacher_name') {
+          param = {teacher_name: this.textcontent}
+        } else if (this.value1 === 'teach_id') {
+          param = {teach_id: this.textcontent}
+        } else if (this.value1 === 'content') {
+          param = {content: this.textcontent}
+        } else if (this.value1 === 'count') {
+          param = {count: this.textcontent}
+        } else {
+          alert('操作客户端变量被篡改的风险，请刷新页面')
+        }
+
+        axios.get(host + '/grade/search/', { // 获取data列表中的数据
+          headers: {
+            'Authorization': 'Bearer ' + this.token
+          },
+          responseType: 'json',
+          params: param
+        }).then(response => {
+          console.log('筛选的班级信息：' + response.data)
+          this.data = response.data.grade // 列表的数据和data是绑一起的
+          this.pagination['count'] = this.data.length
+          this.cur_getData = false
+        })
+          .catch(error => {
+            console.log(error.response.data)
+          })
+      }
+    },
+    load_excel () { // JSON格式
+      if (!this.select_list_all && this.select_list == null) {
+        return
+      }
+      this.to_excel(this.select_list_all ? this.data : this.select_list)
+    },
+    to_excel (data) { // 转化成excel
+      let str = '<tr><td>班级ID</td><td>届号</td><td>学院名称</td><td>专业名称</td><td>班级号</td>' +
+        '<td>班主任ID</td><td>班主任名称</td><td>班级人数</td><td>班级简介</td></tr>' // 列标题
+      // 循环遍历，每行加入tr标签，每个单元格加td标签
+      for (let i = 0; i < data.length; i++) {
+        str += '<tr>'
+        for (const key in data[i]) { // 增加' '为了不让表格显示科学计数法或者其他格式
+          str += '<td>' + data[i][key] + ' ' + '</td>'
+        }
+        str += '</tr>'
+      }
+      const worksheet = 'Sheet1' // Worksheet名
+      const uri = 'data:application/vnd.ms-excel;base64,'
+
+      // 下载的表格模板数据
+      const template = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+      <head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+      <x:Name>${worksheet}</x:Name>
+      <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+      </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+      </head><body><table>${str}</table></body></html>`
+      // 下载模板
+      window.location.href = uri + window.btoa(unescape(encodeURIComponent(template))) // +后是编码
+    },
+    option_id () { // 根据下化框选择学院
+      this.value1 = 'id'
+    },
+    option_year () {
+      this.value1 = 'year'
+    },
+    option_college_name () {
+      this.value1 = 'college_name'
+    },
+    option_major_name () {
+      this.value1 = 'major_name'
+    },
+    option_grade_number () {
+      this.value1 = 'grade_number'
+    },
+    option_teacher_name () {
+      this.value1 = 'teacher_name'
+    },
+    option_teach_id () {
+      this.value1 = 'teach_id'
+    },
+    option_count () {
+      this.value1 = 'count'
+    },
+    option_content () {
+      this.value1 = 'content'
+    },
+    toggleTableSize () { // 调整尺寸函数
+      const size = ['small', 'medium', 'large']
+      const index = (size.indexOf(this.size) + 1) % 3
+      this.size = size[index]
+    },
+    handlePageChange (page) { // 回调当前页
+      this.pagination.current = page
+    },
+    curSelected (selection, row) { // 根据文档提示的回调函数及对应参数，（selection, row）其中row就可以把选中行所有数据取出来，但我们这里只需要从data把值该位selected
+      console.log(selection)
+      this.select_list = []
+      for (let i = 0; i < selection.length; i++) {
+        this.select_list.add(selection[i])
+      }
+    },
+    curAllSelected (selection) { // 点首栏的选择全部才会进入这里
+      this.select_list = [] // 清空select_list_id，以防突然地不勾选或勾选
+      this.select_list_all = selection.length > 0
+      console.log(selection)
+      console.log(selection.length)
+      console.log(this.select_list_all)
+    },
+    errorInfoBox (msg) {
+      const a = this.$bkInfo({
+        type: 'error',
+        title: 'Fail:' + msg,
+        subTitle: '窗口2秒后关闭',
+        showFooter: false
+      })
+      let num = 2
+      let t = setInterval(() => {
+        a.subTitle = `此窗口${--num}秒后关闭`
+        if (num === 0) {
+          clearInterval(t)
+          a.close()
+        }
+      }, 1000)
+    },
+    handleSingle (title, message) {
+      let msg = {theme: 'warning'}
+      msg.title = title
+      msg.message = message
+      msg.offsetY = 80
+      msg.limitLine = 3
+      this.$bkNotify(msg)
+    }
+  }
 }
 </script>
 
-<style scoped>
+<style>
+.demo-custom {
+    font-size: 14px;
+    line-height: 24px;
+    color: #63656e;
+    padding-bottom: 10px;
+}
+.content-icon {
+    color: #ea3636;
+    position: absolute;
+    top: 20px;
+}
+.content-text {
+    display: inline-block;
+    margin-left: 20px;
+}
 
+.dot-menu {
+    display: inline-block;
+    vertical-align: middle;
+}
+.dot-menu-trigger {
+    display: block;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 0;
+    color: #979BA5;
+    cursor: pointer;
+}
+.dot-menu-trigger:hover {
+    color: #3A84FF;
+    background-color: #EBECF0;
+}
+.dot-menu-trigger:before {
+    content: "";
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background-color: currentColor;
+    box-shadow: 0 -4px 0 currentColor, 0 4px 0 currentColor;
+}
+.dot-menu-list {
+    margin: 0;
+    padding: 5px 0;
+    min-width: 50px;
+    list-style: none;
+}
+.dot-menu-list .dot-menu-item {
+    padding: 0 10px;
+    font-size: 12px;
+    line-height: 26px;
+    cursor: pointer;
+}
+.dot-menu-list .dot-menu-item:hover {
+    background-color: #eaf3ff;
+    color: #3a84ff;
+}
 </style>
