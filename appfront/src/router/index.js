@@ -57,6 +57,11 @@ export default new Router({
           component: () => import('../components/teach_student_class.vue')
         },
         {
+          path: '/user',
+          name: 'index.user',
+          component: () => import('../components/user.vue')
+        },
+        {
           path: '/setting',
           name: 'index.setting',
           component: () => import('../components/setting.vue')

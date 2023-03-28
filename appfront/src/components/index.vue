@@ -349,6 +349,11 @@ export default {
     }
     if (this.username === 'admin') {
       this.username_realname = 'ADMIN超级管理员'
+      for (let i = 0; i < this.nav.list.length; i++) {
+        if (this.nav.list[i].name === '账户信息') {
+          this.nav.list[i].disabled = false
+        }
+      }
     } else {
       axios.get(host + '/get_username_realname/', {responseType: 'json',
         params: {username: this.username}}).then(
@@ -410,6 +415,8 @@ export default {
         this.$router.push('/course')
       } else if (obj === '教研室' || obj === '教研室信息') {
         this.$router.push('/teach_student_class')
+      } else if (obj === '账户信息') {
+        this.$router.push('/user')
       } else if (obj === '设置') {
         this.$router.push('/setting')
       } else if (obj === '操作日志') {
