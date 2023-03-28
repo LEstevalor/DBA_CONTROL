@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, transaction
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import DestroyModelMixin
@@ -325,6 +325,7 @@ class StudentViewSet(DestroyModelMixin, GenericViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)  # 即使父类方法有但仍需补充Response，否则报错
 
     # PUT /student/<pk>/JSON内容
+    @transaction.atomic
     def update(self, request, *args, **kwargs):
         cursor = connection.cursor()
         check_grade_id(cursor, request.data["grade_id"])
@@ -351,6 +352,7 @@ class StudentViewSet(DestroyModelMixin, GenericViewSet):
 
     # POST /student/
     # 传入 id name grade_id content，但传出时需带上届号（year） 学院（college_name） 专业（major_name）班级号（grade_number）
+    @transaction.atomic
     def create(self, request):
         cursor = connection.cursor()
         check_grade_id(cursor, request.data["grade_id"])

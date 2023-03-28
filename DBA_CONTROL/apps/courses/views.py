@@ -1,4 +1,4 @@
-from django.db import connection
+from django.db import connection, transaction
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.mixins import DestroyModelMixin, UpdateModelMixin, CreateModelMixin
@@ -53,6 +53,7 @@ class CoursesViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, Gene
         return Response({'teacher_name': teacher_name}, status=status.HTTP_200_OK)
 
     # POST /courses/  {id name content teach_id}
+    @transaction.atomic
     def create(self, request, *args, **kwargs):
         cursor = connection.cursor()
         teacher_name = check_teach_name_and_id(cursor, request.data['teacher_id'])  # 课程创建初始list为零，页面会提供增加功能
