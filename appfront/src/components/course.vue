@@ -7,11 +7,13 @@
           <bk-option id="content" name="课程简介" @click="option_content"></bk-option>
           <bk-option id="teach_id" name="任课老师ID" @click="option_teach_id"></bk-option>
           <bk-option id="teacher_name" name="任课老师名称" @click="option_teacher_name"></bk-option>
+          <bk-option id="student_id" name="学号" @click="option_teacher_name"></bk-option>
         </bk-select>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'name'" key:4 placeholder="请输入课程名称" :left-icon="'bk-icon icon-search'"></bk-input>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'content'" key:4 placeholder="请输入课程简介" :left-icon="'bk-icon icon-search'"></bk-input>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'teach_id'" key:4 placeholder="请输入老师工号ID" :left-icon="'bk-icon icon-search'"></bk-input>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'teacher_name'" key:4 placeholder="请输入任课老师姓名" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'student_id'" key:4 placeholder="请输入学号" :left-icon="'bk-icon icon-search'"></bk-input>
        <bk-button type="search" theme="warning" @click="search_data" size="large">search</bk-button>
      </bk-compose-form-item>
      <div style="float:right;" class="container">
@@ -55,12 +57,20 @@
       <bk-table-column label="课程简介" prop="content"></bk-table-column>
       <bk-table-column label="教师工号" prop="teach_id"></bk-table-column>
       <bk-table-column label="教师名称" prop="teacher_name"></bk-table-column>
-      <bk-table-column label="上课学生" prop="list"></bk-table-column>
-      <bk-table-column label="操作" width="150">
+<!--      <bk-table-column label="上课学生" prop="list"></bk-table-column>-->
+      <bk-table-column label="上课学生" width="150">
         <template slot-scope="props">
-          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280" @confirm="addStudentData(props.row.id)">
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280">
+            <bk-button class="mr10" theme="primary" text @click="handleLongExtend(props.row.id)">课程学生</bk-button>
+          </bk-popconfirm>
+        </template>
+      </bk-table-column>
+      <bk-table-column label="操作" width="180">
+        <template slot-scope="props">
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280" @confirm="OrStudentData(props.row.id)">
             <div slot="content">
               <bk-compose-form-item>
+                <bk-switcher v-model="demo1" size="small" show-text></bk-switcher>&nbsp;&nbsp;ON增/OFF删
                 <h3>学号: <bk-input v-model="add_student_id" type='text'/></h3>
               </bk-compose-form-item>
             </div>
@@ -99,7 +109,7 @@
 
 <script>
 import {bkTable, bkTableColumn, bkButton, bkPopover, bkComposeFormItem, bkInput, bkSelect, bkOption, bkColorPicker,
-  bkIcon, bkPopconfirm} from 'bk-magic-vue'
+  bkIcon, bkPopconfirm, bkSwitcher} from 'bk-magic-vue'
 import axios from 'axios'
 import {host} from '../../static/js/host'
 
@@ -116,7 +126,8 @@ export default {
     bkOption,
     bkColorPicker,
     bkIcon,
-    bkPopconfirm
+    bkPopconfirm,
+    bkSwitcher
   },
   data () {
     return {
@@ -128,16 +139,14 @@ export default {
           name: '数据库',
           content: 'DB SQL NoSQL',
           teach_id: '1472583690',
-          teacher_name: '测试course老师',
-          list: '3120001234 小红 3120001235 小明'
+          teacher_name: '测试course老师'
         },
         {
           id: '2',
           name: 'C++',
           content: 'C++从了解到精通',
           teach_id: '1472583690',
-          teacher_name: '测试course老师',
-          list: '3120001234 小红 3120001235 小明'
+          teacher_name: '测试course老师'
         }
       ],
       pagination: {
@@ -158,6 +167,8 @@ export default {
       create_teach_id: '',
       add_student_id: '',
       cur_getData: true,
+      student_list: '',
+      demo1: true,
       select_list: [], // 判断是否被选中的列表，被点后全部实时更新
       select_list_all: false // 判断是否被全选
     }
@@ -196,7 +207,7 @@ export default {
           {
             'name': this.create_name,
             'content': this.create_content,
-            'teach_id': this.create_teach_id
+            'teacher_id': this.create_teach_id
           })), {
           headers: {
             'Authorization': 'Bearer ' + this.token
@@ -208,8 +219,7 @@ export default {
             'name': this.create_name,
             'content': this.create_content,
             'teach_id': this.create_teach_id,
-            'teacher_name': response.data.teacher_name,
-            'list': response.data.list
+            'teacher_name': response.data.teacher_name
           })
         }).catch(error => {
           alert(error.response.data.message)
@@ -226,7 +236,7 @@ export default {
             'id': id,
             'name': this.update_name,
             'content': this.update_content,
-            'teach_id': this.update_teach_id
+            'teacher_id': this.update_teach_id
           })), {
           headers: {
             'Authorization': 'Bearer ' + this.token
@@ -238,6 +248,7 @@ export default {
               this.data[i].name = this.update_name
               this.data[i].content = this.update_content
               this.data[i].teach_id = this.update_teach_id
+              this.data[i].teacher_name = response.data.teacher_name
               break
             }
           }
@@ -254,8 +265,75 @@ export default {
       this.update_content = content
       this.update_teach_id = teach_id
     },
-    addStudentData (id) {
-      //
+    getStudent (id) {
+      axios.get(host + '/student_course/student/', {
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json',
+        params: {id: id}
+      }).then(response => {
+        this.student_list = response.data.list // 列表的数据和data是绑一起的
+      })
+        .catch(error => {
+          console.log(error.response.data)
+        })
+    },
+    handleLongExtend (id) {
+      this.getStudent(id)
+      this.$bkNotify({
+          title: "上课学生",
+          message: this.student_list,
+          theme: 'primary ',
+          offsetY: 80,
+          showViewMore: true,
+          limitLine: 2,
+          onViewMoreHandler () {
+              this.limitLine = 0
+              this.showViewMore = false
+          }
+      })
+    },
+    OrStudentData (course_id) {
+      console.log(this.demo1)
+      if (this.demo1) {
+        this.addStudentData (course_id)
+      } else {
+        this.removeStudentData (course_id)
+      }
+    },
+    addStudentData (course_id) {
+      axios.post(host + '/student_course/',  JSON.parse(JSON.stringify(
+        {
+          course_id: course_id,
+          student_id: this.add_student_id
+        })),{
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json'
+      }).then(response => {
+        this.successInfoBox("添加成功")
+      })
+        .catch(error => {
+          this.errorInfoBox("删除失败：" + error.response.data)
+          console.log(error.response.data)
+        })
+    },
+    removeStudentData (course_id) {
+      axios.get(host + '/student_course/delete/',{
+        headers: {
+          'Authorization': 'Bearer ' + this.token
+        },
+        responseType: 'json',
+        params: {course_id: course_id, student_id: this.add_student_id}
+      }).then(response => {
+        this.successInfoBox("删除成功")
+      })
+        .catch(error => {
+          this.errorInfoBox("删除失败：" + error.message)
+          console.log(error.response.data)
+        })
     },
     removeData (id) {
       // 删除数据
@@ -289,7 +367,11 @@ export default {
         } else if (this.value1 === 'content') {
           param = {content: this.textcontent}
         } else if (this.value1 === 'teacher_name') {
-          param = {teach_name: this.textcontent}
+          param = {teacher_name: this.textcontent}
+        } else if (this.value1 === 'teach_id') {
+          param = {teach_id: this.textcontent}
+        } else if (this.value1 === 'student_id') {
+          param = {student_id: this.textcontent}
         } else {
           alert('操作客户端变量被篡改的风险，请刷新页面')
         }
@@ -406,12 +488,54 @@ export default {
       msg.offsetY = 80
       msg.limitLine = 3
       this.$bkNotify(msg)
+    },
+    successInfoBox (msg) {
+      const h = this.$createElement
+      const a = this.$bkInfo({
+        type: 'success',
+        title: msg,
+        showFooter: false,
+        subHeader: h('a', {
+          style: {
+            color: '#3a84ff',
+            textDecoration: 'none',
+            cursor: 'pointer'
+          }
+        })
+      })
+      let num = 1
+      let t = setInterval(() => {
+        if (--num === 0) {
+          clearInterval(t)
+          a.close()
+        }
+      }, 1000)
+    },
+    errorInfoBox (msg) {
+      const a = this.$bkInfo({
+        type: 'error',
+        title: 'Fail:' + msg,
+        subTitle: '窗口2秒后关闭',
+        showFooter: false
+      })
+      let num = 2
+      let t = setInterval(() => {
+        a.subTitle = `此窗口${--num}秒后关闭`
+        if (num === 0) {
+          clearInterval(t)
+          a.close()
+        }
+      }, 1000)
     }
   }
 }
 </script>
 
 <style>
+.demo-box .bk-switcher {
+    margin-right: 20px;
+}
+
 .demo-custom {
     font-size: 14px;
     line-height: 24px;

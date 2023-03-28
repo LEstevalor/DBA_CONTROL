@@ -13,13 +13,16 @@ def is_valid_email(email):
 
 
 def check_teach_name_and_id(cursor, teach_id, teacher_name=None):
-    """传入connection和教师名称、教师ID，检查ID是否存在，id和name是否匹配得上，如果存在则不返回，不存在则报错404"""
+    """传入connection和教师名称、教师ID，检查ID是否存在，id和name是否匹配得上，如果存在则返回教师名称，不存在则报错404"""
     message = ''
     if teacher_name:
-        cursor.execute("select content from gdut_teacher where id = '%s' and name = '%s'" % (teach_id, teacher_name))
+        cursor.execute("select name from gdut_teacher where id = '%s' and name = '%s'" % (teach_id, teacher_name))
         message = "教师ID不存在或教师名称与教师ID匹配不上"
     else:
-        cursor.execute("select content from gdut_teacher where id = '%s'" % teach_id)
+        cursor.execute("select name from gdut_teacher where id = '%s'" % teach_id)
         message = "教师ID不存在"
-    if cursor.fetchone() is None:
+    tup = cursor.fetchone()
+    if tup is None:
         return Response({"message": message}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return tup[0]

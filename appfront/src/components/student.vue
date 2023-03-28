@@ -311,7 +311,7 @@ export default {
           'Authorization': 'Bearer ' + this.token
         },
         responseType: 'json',
-        id: id
+        params: {id: id}
       }).then(response => {
         for (let i = 0; i < this.data.length; i++) {
           if (this.data[i].id === id) { // 从数组中移除地址
