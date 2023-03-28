@@ -3,12 +3,12 @@
      <bk-compose-form-item class="select-demo">
        <div>&nbsp;</div>
         <bk-select v-model="value1" style="width: 140px" size="large" :clearable="false">
-          <bk-option id="id" name="课程名称" @click="option_name"></bk-option>
+          <bk-option id="name" name="课程名称" @click="option_name"></bk-option>
           <bk-option id="content" name="课程简介" @click="option_content"></bk-option>
-          <bk-option id="content" name="任课老师工号ID" @click="option_teach_id"></bk-option>
-          <bk-option id="content" name="任课老师" @click="option_teacher_name"></bk-option>
+          <bk-option id="teach_id" name="任课老师ID" @click="option_teach_id"></bk-option>
+          <bk-option id="teacher_name" name="任课老师名称" @click="option_teacher_name"></bk-option>
         </bk-select>
-        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'name'" key:4 placeholder="请输入课程名" :left-icon="'bk-icon icon-search'"></bk-input>
+        <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'name'" key:4 placeholder="请输入课程名称" :left-icon="'bk-icon icon-search'"></bk-input>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'content'" key:4 placeholder="请输入课程简介" :left-icon="'bk-icon icon-search'"></bk-input>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'teach_id'" key:4 placeholder="请输入老师工号ID" :left-icon="'bk-icon icon-search'"></bk-input>
         <bk-input style="width: 400px" size="large" v-model=textcontent v-if="value1 === 'teacher_name'" key:4 placeholder="请输入任课老师姓名" :left-icon="'bk-icon icon-search'"></bk-input>
@@ -46,6 +46,7 @@
         :size="size"
         :pagination="pagination"
         @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
         @select="curSelected"
         @select-all="curAllSelected">
       <bk-table-column type="selection" width="60"></bk-table-column>  <!--可选的地方-->
@@ -57,8 +58,15 @@
       <bk-table-column label="上课学生" prop="list"></bk-table-column>
       <bk-table-column label="操作" width="150">
         <template slot-scope="props">
-          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="288"
-                         @confirm="changeData(props.row.id)">
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280" @confirm="addStudentData(props.row.id)">
+            <div slot="content">
+              <bk-compose-form-item>
+                <h3>学号: <bk-input v-model="add_student_id" type='text'/></h3>
+              </bk-compose-form-item>
+            </div>
+            <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'">增加</bk-button>
+          </bk-popconfirm>
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280" @confirm="changeData(props.row.id)">
               <div slot="content">
                   <bk-compose-form-item>
                     <h3>课程名称: <bk-input v-model="update_name" type='text'/></h3>
@@ -69,8 +77,7 @@
               <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'" @click=
                 "update_init(props.row.name, props.row.content, props.row.teach_id)">修改</bk-button>
           </bk-popconfirm>
-          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="288"
-                         @confirm="removeData(props.row.id)">
+          <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280" @confirm="removeData(props.row.id)">
               <div slot="content">
                   <div class="demo-custom">
                       <i class="bk-icon icon-info-circle-shape pr5 content-icon"></i>
@@ -138,6 +145,7 @@ export default {
         count: 0, // 总数
         limit: 10 // 限制
       },
+      page_data: [],
       value1: 'name',
       token: localStorage.token || sessionStorage.token,
       username: localStorage.username || sessionStorage.username,
@@ -148,6 +156,7 @@ export default {
       create_name: '',
       create_content: '',
       create_teach_id: '',
+      add_student_id: '',
       cur_getData: true,
       select_list: [], // 判断是否被选中的列表，被点后全部实时更新
       select_list_all: false // 判断是否被全选
@@ -168,10 +177,18 @@ export default {
         this.data = response.data.courses // 列表的数据和data是绑一起的
         this.pagination['count'] = this.data.length
         this.cur_getData = true
+        this.getPageData()
       })
         .catch(error => {
           console.log(error.response.data)
         })
+    },
+    getPageData () { // 分页操作显示列表
+      this.page_data = []
+      let start = (this.pagination.current - 1) * this.pagination.limit
+      for (let i = start; i < this.pagination.current * this.pagination.limit  && i < this.pagination.count; i++) {
+          this.page_data.push(this.data[i]);
+      }
     },
     addData () {
       if (this.create_name && this.create_content && this.create_teach_id) {
@@ -237,6 +254,9 @@ export default {
       this.update_content = content
       this.update_teach_id = teach_id
     },
+    addStudentData (id) {
+      //
+    },
     removeData (id) {
       // 删除数据
       axios.delete(host + '/courses/' + id + '/', {
@@ -285,6 +305,7 @@ export default {
           this.data = response.data.courses // 列表的数据和data是绑一起的
           this.pagination['count'] = this.data.length
           this.cur_getData = false
+          this.getPageData()
         })
           .catch(error => {
             console.log(error.response.data)
@@ -341,6 +362,12 @@ export default {
     },
     handlePageChange (page) { // 回调当前页
       this.pagination.current = page
+      this.getPageData()
+    },
+    handlePageLimitChange () { // 当用户切换表格每页显示条数时会出发的事件
+      console.log('handlePageLimitChange', arguments)
+      this.pagination.limit = arguments[0]
+      this.getPageData()
     },
     curSelected (selection, row) { // 根据文档提示的回调函数及对应参数，（selection, row）其中row就可以把选中行所有数据取出来，但我们这里只需要从data把值该位selected
       console.log(selection)

@@ -61,6 +61,7 @@
         :size="size"
         :pagination="pagination"
         @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
         @select="curSelected"
         @select-all="curAllSelected">
       <bk-table-column type="selection" width="60"></bk-table-column>  <!--可选的地方-->
@@ -170,6 +171,7 @@ export default {
         count: 0, // 总数
         limit: 10 // 限制
       },
+      page_data: [],
       value1: 'id',
       token: localStorage.token || sessionStorage.token,
       username: localStorage.username || sessionStorage.username,
@@ -209,10 +211,18 @@ export default {
         this.data = response.data.grade // 列表的数据和data是绑一起的
         this.pagination['count'] = this.data.length
         this.cur_getData = true
+        this.getPageData()
       })
         .catch(error => {
           console.log(error.response.data)
         })
+    },
+    getPageData () { // 分页操作显示列表
+      this.page_data = []
+      let start = (this.pagination.current - 1) * this.pagination.limit
+      for (let i = start; i < this.pagination.current * this.pagination.limit  && i < this.pagination.count; i++) {
+          this.page_data.push(this.data[i]);
+      }
     },
     addData () {
       if (this.create_year && this.create_college_name && this.create_major_name && this.create_grade_number &&
@@ -361,6 +371,7 @@ export default {
           this.data = response.data.grade // 列表的数据和data是绑一起的
           this.pagination['count'] = this.data.length
           this.cur_getData = false
+          this.getPageData()
         })
           .catch(error => {
             console.log(error.response.data)
@@ -433,6 +444,12 @@ export default {
     },
     handlePageChange (page) { // 回调当前页
       this.pagination.current = page
+      this.getPageData()
+    },
+    handlePageLimitChange () { // 当用户切换表格每页显示条数时会出发的事件
+      console.log('handlePageLimitChange', arguments)
+      this.pagination.limit = arguments[0]
+      this.getPageData()
     },
     curSelected (selection, row) { // 根据文档提示的回调函数及对应参数，（selection, row）其中row就可以把选中行所有数据取出来，但我们这里只需要从data把值该位selected
       console.log(selection)

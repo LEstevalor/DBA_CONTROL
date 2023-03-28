@@ -51,10 +51,11 @@
       &nbsp;<bk-icon type="upload" />&nbsp;<bk-button theme="success" @click="load_excel()"> 数据导出</bk-button>
     </div>
     <bk-table style="margin-top: 15px;"
-        :data="data"
+        :data="page_data"
         :size="size"
         :pagination="pagination"
         @page-change="handlePageChange"
+        @page-limit-change="handlePageLimitChange"
         @select="curSelected"
         @select-all="curAllSelected">
       <bk-table-column type="selection" width="60"></bk-table-column>  <!--可选的地方-->
@@ -98,7 +99,7 @@
               <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'">删除</bk-button>
           </bk-popconfirm>
           <bk-popover class="dot-menu" placement="bottom-start" theme="dot-menu light"
-                      :trigger="props.$index % 2 === 0 ? 'click' : 'mouseenter'" :arrow="false" offset="15"
+                      :trigger="props.$index % 2 === 0 ? 'click' : 'mouseenter'" :arrow="false" offset="200"
                       :distance="0">
             <span class="dot-menu-trigger"></span>
           </bk-popover>
@@ -155,11 +156,13 @@ export default {
           grade_id: '3'
         }
       ],
+      page_data: [], // 用于展示
       pagination: {
         current: 1, // 首页
         count: 0, // 总数
         limit: 10 // 限制
       },
+      page_data: [],
       value1: 'id',
       token: localStorage.token || sessionStorage.token,
       username: localStorage.username || sessionStorage.username,
@@ -194,11 +197,21 @@ export default {
         console.log('学生信息' + response.data)
         this.data = response.data.student // 列表的数据和data是绑一起的
         this.pagination['count'] = this.data.length
+        console.log("学生信息获取成功" + this.data.length)
         this.cur_getData = true
+
+        this.getPageData()
       })
         .catch(error => {
           console.log(error.response.data)
         })
+    },
+    getPageData () { // 分页操作显示列表
+      this.page_data = []
+      let start = (this.pagination.current - 1) * this.pagination.limit
+      for (let i = start; i < this.pagination.current * this.pagination.limit  && i < this.pagination.count; i++) {
+          this.page_data.push(this.data[i]);
+      }
     },
     addData () {
       if (this.create_id && this.create_name && this.create_content && this.create_grade_id) {
@@ -347,8 +360,9 @@ export default {
         }).then(response => {
           console.log('筛选的班级信息：' + response.data)
           this.data = response.data.student // 列表的数据和data是绑一起的
-          this.pagination['count'] = this.data.length
           this.cur_getData = false
+          this.pagination['count'] = this.data.length
+          this.getPageData()
         })
           .catch(error => {
             console.log(error.response.data)
@@ -418,6 +432,13 @@ export default {
     },
     handlePageChange (page) { // 回调当前页
       this.pagination.current = page
+      this.getPageData()
+      // console.log(this.pagination.current)
+    },
+    handlePageLimitChange () { // 当用户切换表格每页显示条数时会出发的事件
+      console.log('handlePageLimitChange', arguments)
+      this.pagination.limit = arguments[0]
+      this.getPageData()
     },
     curSelected (selection, row) { // 根据文档提示的回调函数及对应参数，（selection, row）其中row就可以把选中行所有数据取出来，但我们这里只需要从data把值该位selected
       console.log(selection)

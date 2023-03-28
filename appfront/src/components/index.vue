@@ -258,8 +258,28 @@ export default {
             id: 1
           },
           {
-            name: '个人课程',
+            name: '专业信息',
             id: 2
+          },
+          {
+            name: '教师信息',
+            id: 3
+          },
+          {
+            name: '学生课程',
+            id: 4
+          },
+          {
+            name: '班级信息',
+            id: 5
+          },
+          {
+            name: '课程信息',
+            id: 6
+          },
+          {
+            name: '教研室信息',
+            id: 7
           }
         ],
         active: 2,
@@ -373,21 +393,22 @@ export default {
         })
     },
     checkout (obj) {
+      console.log(obj)
       if (obj === '首页') {
         this.$router.push('/top')
-      } else if (obj === '学院') {
+      } else if (obj === '学院' || obj === '学院信息') {
         this.$router.push('/college')
-      } else if (obj === '专业') {
+      } else if (obj === '专业' || obj === '专业信息') {
         this.$router.push('/major')
-      } else if (obj === '教师') {
+      } else if (obj === '教师' || obj === '教师信息') {
         this.$router.push('/teacher')
       } else if (obj === '学生信息') {
         this.$router.push('/student')
-      } else if (obj === '班级') {
+      } else if (obj === '班级' || obj === '班级信息') {
         this.$router.push('/grade')
       } else if (obj === '课程信息') {
         this.$router.push('/course')
-      } else if (obj === '教研室') {
+      } else if (obj === '教研室' || obj === '教研室信息') {
         this.$router.push('/teach_student_class')
       } else if (obj === '设置') {
         this.$router.push('/setting')
