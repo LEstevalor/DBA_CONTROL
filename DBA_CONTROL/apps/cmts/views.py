@@ -110,6 +110,8 @@ class MajorViewSet(DestroyModelMixin, GenericViewSet):
         for tup in tuples:
             cursor.execute("select sum(count) from gdut_grade where major_id = '%s'", tup[0])
             count = cursor.fetchone()[0]
+            if count is None:
+                count = 0
             data.append({"id": tup[0], "ip": tup[1], "source": tup[2], "content": tup[3], "count": count})
 
         return Response({'major': data})

@@ -243,7 +243,8 @@ export default {
           {
             name: '操作日志',
             icon: 'icon-weixin-shape',
-            url: '/blank/'
+            url: '/blank/',
+            disabled: true
           }
         ],
         id: '首页',

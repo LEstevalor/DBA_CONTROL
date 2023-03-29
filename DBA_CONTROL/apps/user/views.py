@@ -44,7 +44,7 @@ class EmailSendView(APIView):
         pl.execute()
 
         subject = "GDUT DBA系统 邮箱验证"
-        html_message = '<p>尊敬的⽤户您好！只因你！</p>' \
+        html_message = '<p>尊敬的⽤户您好！</p>' \
                        '<p>感谢您使⽤GDUT DBA系统。</p>' \
                        '<p>您的邮箱为：%s ，验证码为：%s</p>' % (email, sms_code)
         send_mail(subject, "", settings.EMAIL_FROM, [email], html_message=html_message)
@@ -138,3 +138,24 @@ class StatusView(APIView):
             return Response({"status": level[0]})
         else:
             return Response({'message': '搜取不到权限'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ResetPassword(APIView):
+
+    def post(self, request):
+        username = request.data["username"]
+        password = request.data["password"]
+        email = request.data["email"]
+        cursor = connection.cursor()
+        cursor.execute("select id from gdut_users where username = '%s' and password = '%s' and email = '%s'" % (username, password, email))
+        tup = cursor.fetchone()
+        if tup is None:
+            return Response({"message": "原密码不对"}, status=status.HTTP_400_BAD_REQUEST)
+
+        password2 = request.data["password2"]
+        password22 = request.data["password22"]
+        if password2 != password22 or len(password2) < 6:
+            return Response({"新密码重输不一致或密码小于6位"}, status=status.HTTP_400_BAD_REQUEST)
+
+        cursor.execute("update gdut_users set password = '%s' where username = '%s'" % (password2, username))
+        return Response(status=status.HTTP_200_OK)

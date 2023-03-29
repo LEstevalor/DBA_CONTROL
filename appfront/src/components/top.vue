@@ -8,11 +8,13 @@
 
 <script>
 import { bkSwiper } from 'bk-magic-vue'
-import firstSwiper from '../assets/china2023.jpg'
+import firstSwiper from '../assets/2023label.jpg'
 import secondSwiper from '../assets/gdut_label.jpg'
 import thirdSwiper from '../assets/db.jpg'
 import fourthSwiper from '../assets/nosql.jpg'
 import fifthSwiper from '../assets/machine.jpg'
+import sixthSwiper from '../assets/dragonCenter.jpg'
+
 
 export default {
   name: 'top',
@@ -27,7 +29,8 @@ export default {
         {url: secondSwiper},
         {url: thirdSwiper},
         {url: fourthSwiper},
-        {url: fifthSwiper}
+        {url: fifthSwiper},
+        {url: sixthSwiper}
       ]
     }
   },

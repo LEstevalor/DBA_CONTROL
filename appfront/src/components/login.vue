@@ -185,7 +185,7 @@ export default {
         this.warningInfoBox('请输入正确admin或学号或职工号')
         return false
       } else if (!this.password || this.password.length < 6) {
-        this.warningInfoBox('请输入密码且密码大于6位')
+        this.warningInfoBox('请输入密码且密码大于等于6位')
         return false
       } else if (this.password !== this.password2) {
         this.warningInfoBox('请确保两次密码输入相同')

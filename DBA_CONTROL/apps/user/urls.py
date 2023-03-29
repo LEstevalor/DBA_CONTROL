@@ -17,4 +17,6 @@ urlpatterns = (
     url(r'^check_user/$', views.UserView.as_view()),  # 判断前端用户状态是否正确
 
     url(r'^status/$', views.StatusView.as_view()),  # 获取权限级别
+
+    url(r'^resetPassword/$', views.ResetPassword.as_view())  # 重置密码
 )
