@@ -67,8 +67,8 @@ export default new Router({
           component: () => import('../components/setting.vue')
         },
         {
-          path: '/log',
-          name: 'index.log',
+          path: '/logs',
+          name: 'index.logs',
           component: () => import('../components/log.vue')
         }
       ]

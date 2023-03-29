@@ -51,7 +51,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='is_staff',
-            field=models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status'),
+            field=models.BooleanField(default=False, help_text='Designates whether the user can logs into this admin site.', verbose_name='staff status'),
         ),
         migrations.AddField(
             model_name='user',

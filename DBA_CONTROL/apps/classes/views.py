@@ -1,3 +1,5 @@
+import logging
+
 from django.db import connection
 from rest_framework import status
 from rest_framework.decorators import action
@@ -9,6 +11,8 @@ from rest_framework.response import Response
 from DBA_CONTROL.utils.tools import check_teach_name_and_id
 from classes.models import Teach_research_office, Grade
 from classes.serializers import TeachStudentClassSerializer, GradeSerializer
+
+logger = logging.getLogger('django')
 
 
 def check_college_name(cursor, college_name):

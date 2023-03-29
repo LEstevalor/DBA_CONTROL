@@ -130,7 +130,7 @@ export default {
     send_sms_code () {
       if (this.send_flag && this.check_before_email()) {
         this.send_flag = false // 60s后才允许再次发送
-        // console.log(host + '/email_codes/' + this.email + '/')
+        // console.logs(host + '/email_codes/' + this.email + '/')
         axios.get(host + '/email_codes/', {responseType: 'json', params: {email: this.email}})
           .then(response => {
             var num = 60 // 倒计时60秒，60秒后允许用户再次点击发送短信验证码的按钮

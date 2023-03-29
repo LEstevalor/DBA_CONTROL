@@ -421,7 +421,7 @@ export default {
       } else if (obj === '设置') {
         this.$router.push('/setting')
       } else if (obj === '操作日志') {
-        this.$router.push('/log')
+        this.$router.push('/logs')
       }
     },
     login_out () {

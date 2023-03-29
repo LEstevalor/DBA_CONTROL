@@ -1,3 +1,5 @@
+import logging
+
 from django.db import connection, transaction
 from rest_framework import status
 from rest_framework.decorators import action
@@ -8,6 +10,8 @@ from rest_framework.viewsets import GenericViewSet
 
 from cmts.models import College, Teacher, Major, Student
 from cmts.serializers import CollegeSerializer, MajorSerializer, TeacherSerializer, StudentSerializer
+
+logger = logging.getLogger('django')
 
 
 class CollegeViewSet(DestroyModelMixin, GenericViewSet):

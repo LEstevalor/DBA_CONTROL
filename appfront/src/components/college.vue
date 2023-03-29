@@ -191,8 +191,8 @@ export default {
           },
           responseType: 'json'
         }).then(response => {
-          // console.log(response.data)
-          // console.log(Number(response.data.id))
+          // console.logs(response.data)
+          // console.logs(Number(response.data.id))
           this.data.push({
             'ip': this.create_college_name,
             'source': this.create_dean_name,
@@ -339,7 +339,7 @@ export default {
     handlePageChange (page) { // 回调当前页
       this.pagination.current = page
       this.getPageData()
-      // console.log(this.pagination.current)
+      // console.logs(this.pagination.current)
     },
     handlePageLimitChange () { // 当用户切换表格每页显示条数时会出发的事件
       console.log('handlePageLimitChange', arguments)

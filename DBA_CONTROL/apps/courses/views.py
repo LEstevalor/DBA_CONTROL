@@ -1,3 +1,5 @@
+import logging
+
 from django.db import connection, transaction
 from rest_framework import status
 from rest_framework.decorators import action
@@ -9,6 +11,8 @@ from rest_framework.viewsets import GenericViewSet
 from DBA_CONTROL.utils.tools import check_teach_name_and_id
 from courses.models import Course, Student_Course
 from courses.serializers import CourseSerializer, StudentCourseSerializer
+
+logger = logging.getLogger('django')
 
 
 class CoursesViewSet(CreateModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):

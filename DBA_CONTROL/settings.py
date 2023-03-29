@@ -87,6 +87,48 @@ TEMPLATES = [
     },
 ]
 
+# 日志
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # 是否禁用已经存在的日志器
+    'formatters': {  # 日志信息显示的格式
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(lineno)d %(message)s'   # %s为字符串 %d为整数，levelname代表级别（五种：DEBUG/INFO/WARNING/ERROR/CRITICAL），asctime为时间，module打印模块名称，lineno打印日志级别的数值，message为信息
+        },
+        'simple': {
+        	'format': '%(levelname)s %(module)s %(lineno)d %(message)s'
+        },
+    },
+    'filters': {  # 对日志进行过滤
+        'require_debug_true': {  # django在debug模式下才输出日志
+        	'()': 'django.utils.log.RequireDebugTrue',  # Debug为True
+        },
+    },
+    'handlers': {  # 日志处理方法
+        'console': {  # 向终端中输出日志
+            'level': 'INFO',   # 输出级别
+            'filters': ['require_debug_true'],  # 指定上面写的过滤器（过滤添加为Debug为true才能向控制台输出）
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'  # 输出格式，也是上面写的格式simple
+        },
+        'file': {  # 向文件中输出日志
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, "logs/dba_control.log"),  # 日志文件的位置（需要创建目录logs），那么就需要BASE_DIR的dirname即上一级目录
+            'maxBytes': 300 * 1024 * 1024,  # 300兆，若超过，则再创建一个，在文件名后加1 2 ...
+            'backupCount': 10,              # 若文件超过十个，将会删除
+            'formatter': 'verbose',         # 输出格式，也是上面写的格式verbose
+        },
+    },
+    'loggers': {  # 日志器
+        'django': {  # 定义了一个名为django的日志器（后续获取logger对象的时候会使用到）
+            'handlers': ['console', 'file'],  # 可以同时向终端与文件中输出日志
+            'propagate': True,  # 是否继续传递日志信息
+            'level': 'INFO',  # 日志器接收的最低日志级别
+        },
+    },
+}
+
 WSGI_APPLICATION = 'DBA_CONTROL.wsgi.application'
 
 
