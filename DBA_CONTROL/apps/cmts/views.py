@@ -27,6 +27,9 @@ class CollegeViewSet(DestroyModelMixin, GenericViewSet):
 
     # GET /college/
     def list(self, request, *args, **kwargs):
+        print(request)
+        print(request.user)
+        print(request.user.username)
         cursor = connection.cursor()
         cursor.execute("select c.id, c.name, t.name, c.content from gdut_college c, gdut_teacher t where c.dean_id = t.id")
         tuples = cursor.fetchall()

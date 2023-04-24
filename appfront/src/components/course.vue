@@ -61,7 +61,7 @@
       <bk-table-column label="上课学生" width="150">
         <template slot-scope="props">
           <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280">
-            <bk-button class="mr10" theme="primary" text @click="handleLongExtend(props.row.id)">课程学生</bk-button>
+            <bk-button class="mr10" theme="primary" text @click="handleLongExtend(props.row.id, props.row.name)">课程学生</bk-button>
           </bk-popconfirm>
         </template>
       </bk-table-column>
@@ -74,7 +74,7 @@
                 <h3>学号: <bk-input v-model="add_student_id" type='text'/></h3>
               </bk-compose-form-item>
             </div>
-            <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'">增加</bk-button>
+            <bk-button class="mr10" theme="primary" text :disabled="status === 'USER'">学生</bk-button>
           </bk-popconfirm>
           <bk-popconfirm trigger="click" :ext-cls="'asadsadsads'" width="280" @confirm="changeData(props.row.id)">
               <div slot="content">
@@ -265,7 +265,7 @@ export default {
       this.update_content = content
       this.update_teach_id = teach_id
     },
-    getStudent (id) {
+    handleLongExtend (id, name) {
       axios.get(host + '/student_course/student/', {
         headers: {
           'Authorization': 'Bearer ' + this.token
@@ -274,15 +274,8 @@ export default {
         params: {id: id}
       }).then(response => {
         this.student_list = response.data.list // 列表的数据和data是绑一起的
-      })
-        .catch(error => {
-          console.log(error.response.data)
-        })
-    },
-    handleLongExtend (id) {
-      this.getStudent(id)
-      this.$bkNotify({
-          title: "上课学生",
+        this.$bkNotify({
+          title: name + "——上课学生",
           message: this.student_list,
           theme: 'primary ',
           offsetY: 80,
@@ -292,7 +285,11 @@ export default {
               this.limitLine = 0
               this.showViewMore = false
           }
+        })
       })
+        .catch(error => {
+          console.log(error.response.data)
+        })
     },
     OrStudentData (course_id) {
       console.log(this.demo1)
@@ -314,6 +311,7 @@ export default {
         responseType: 'json'
       }).then(response => {
         this.successInfoBox("添加成功")
+        this.add_student_id = ''
       })
         .catch(error => {
           this.errorInfoBox("删除失败：" + error.response.data)
